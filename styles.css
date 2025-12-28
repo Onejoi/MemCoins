@@ -9,29 +9,29 @@
     --bg-secondary: #1e2329;
     --bg-tertiary: #2b3139;
     --bg-hover: #363c45;
-    
+
     --text-primary: #eaecef;
     --text-secondary: #848e9c;
     --text-muted: #5e6673;
-    
+
     --accent-gold: #f0b90b;
     --accent-gold-hover: #fcd535;
-    
+
     --green: #0ecb81;
     --green-bg: rgba(14, 203, 129, 0.1);
     --red: #f6465d;
     --red-bg: rgba(246, 70, 93, 0.1);
-    
+
     /* Rarity colors */
     --common: #9aa4af;
     --rare: #3b82f6;
     --epic: #a855f7;
     --legendary: #f59e0b;
-    
+
     /* Spacing */
     --nav-height: 60px;
     --header-height: 56px;
-    
+
     /* Border radius */
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -163,25 +163,37 @@ body {
    ============================================ */
 
 .exchange-layout {
-    display: grid;
-    grid-template-columns: 140px 1fr 200px;
+    display: flex;
+    flex-direction: column;
     gap: 1px;
     background: var(--bg-tertiary);
     min-height: calc(100vh - var(--header-height) - var(--nav-height));
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
+/* Desktop layout */
+@media (min-width: 769px) {
     .exchange-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+        display: grid;
+        grid-template-columns: 140px 1fr 200px;
     }
-    
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
     .trading-pairs {
         display: none;
     }
-    
+
     .orderbook {
         order: 2;
+        max-height: 300px;
+    }
+
+    .chart-section {
+        order: 1;
     }
 }
 
@@ -242,8 +254,13 @@ body {
     font-weight: 500;
 }
 
-.pair-item .change.positive { color: var(--green); }
-.pair-item .change.negative { color: var(--red); }
+.pair-item .change.positive {
+    color: var(--green);
+}
+
+.pair-item .change.negative {
+    color: var(--red);
+}
 
 /* Chart Section */
 .chart-section {
@@ -349,9 +366,11 @@ body {
 
 /* Chart Container */
 .chart-container {
-    flex: 1;
-    min-height: 300px;
+    width: 100%;
+    min-height: 250px;
+    max-height: 350px;
     padding: 8px;
+    overflow: hidden;
 }
 
 /* Order Section */
@@ -589,11 +608,21 @@ body {
     opacity: 0.15;
 }
 
-.orderbook-asks .orderbook-row .price { color: var(--red); }
-.orderbook-asks .orderbook-row .depth { background: var(--red); }
+.orderbook-asks .orderbook-row .price {
+    color: var(--red);
+}
 
-.orderbook-bids .orderbook-row .price { color: var(--green); }
-.orderbook-bids .orderbook-row .depth { background: var(--green); }
+.orderbook-asks .orderbook-row .depth {
+    background: var(--red);
+}
+
+.orderbook-bids .orderbook-row .price {
+    color: var(--green);
+}
+
+.orderbook-bids .orderbook-row .depth {
+    background: var(--green);
+}
 
 .orderbook-spread {
     padding: 8px 12px;
@@ -640,9 +669,18 @@ body {
     font-size: 11px;
 }
 
-.trade-row .price.buy { color: var(--green); }
-.trade-row .price.sell { color: var(--red); }
-.trade-row .time { color: var(--text-muted); text-align: right; }
+.trade-row .price.buy {
+    color: var(--green);
+}
+
+.trade-row .price.sell {
+    color: var(--red);
+}
+
+.trade-row .time {
+    color: var(--text-muted);
+    text-align: right;
+}
 
 /* ============================================
    Chests Page
@@ -669,9 +707,17 @@ body {
     border-color: var(--accent-gold);
 }
 
-.chest-card.free { border-top: 3px solid var(--common); }
-.chest-card.premium { border-top: 3px solid var(--rare); }
-.chest-card.legendary { border-top: 3px solid var(--legendary); }
+.chest-card.free {
+    border-top: 3px solid var(--common);
+}
+
+.chest-card.premium {
+    border-top: 3px solid var(--rare);
+}
+
+.chest-card.legendary {
+    border-top: 3px solid var(--legendary);
+}
 
 .chest-icon {
     font-size: 64px;
@@ -680,8 +726,15 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .chest-name {
@@ -716,10 +769,25 @@ body {
     border-radius: var(--radius-sm);
 }
 
-.chest-odds .common { color: var(--common); background: rgba(154, 164, 175, 0.1); }
-.chest-odds .rare { color: var(--rare); background: rgba(59, 130, 246, 0.1); }
-.chest-odds .epic { color: var(--epic); background: rgba(168, 85, 247, 0.1); }
-.chest-odds .legendary { color: var(--legendary); background: rgba(245, 158, 11, 0.1); }
+.chest-odds .common {
+    color: var(--common);
+    background: rgba(154, 164, 175, 0.1);
+}
+
+.chest-odds .rare {
+    color: var(--rare);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.chest-odds .epic {
+    color: var(--epic);
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.chest-odds .legendary {
+    color: var(--legendary);
+    background: rgba(245, 158, 11, 0.1);
+}
 
 .chest-btn {
     width: 100%;
@@ -772,10 +840,21 @@ body {
     border-color: var(--accent-gold);
 }
 
-.card-item.common { border-top: 3px solid var(--common); }
-.card-item.rare { border-top: 3px solid var(--rare); }
-.card-item.epic { border-top: 3px solid var(--epic); }
-.card-item.legendary { border-top: 3px solid var(--legendary); }
+.card-item.common {
+    border-top: 3px solid var(--common);
+}
+
+.card-item.rare {
+    border-top: 3px solid var(--rare);
+}
+
+.card-item.epic {
+    border-top: 3px solid var(--epic);
+}
+
+.card-item.legendary {
+    border-top: 3px solid var(--legendary);
+}
 
 .card-item .emoji {
     font-size: 48px;
@@ -795,10 +874,21 @@ body {
     margin-bottom: 8px;
 }
 
-.card-item.common .rarity { color: var(--common); }
-.card-item.rare .rarity { color: var(--rare); }
-.card-item.epic .rarity { color: var(--epic); }
-.card-item.legendary .rarity { color: var(--legendary); }
+.card-item.common .rarity {
+    color: var(--common);
+}
+
+.card-item.rare .rarity {
+    color: var(--rare);
+}
+
+.card-item.epic .rarity {
+    color: var(--epic);
+}
+
+.card-item.legendary .rarity {
+    color: var(--legendary);
+}
 
 .card-item .value {
     font-size: 14px;
@@ -1058,8 +1148,15 @@ body {
 }
 
 @keyframes shake {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
+
+    0%,
+    100% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(5deg);
+    }
 }
 
 .revealed-card {
@@ -1069,8 +1166,15 @@ body {
 }
 
 @keyframes reveal {
-    from { transform: scale(0) rotate(180deg); opacity: 0; }
-    to { transform: scale(1) rotate(0); opacity: 1; }
+    from {
+        transform: scale(0) rotate(180deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
 }
 
 .card-rarity {
@@ -1080,10 +1184,21 @@ body {
     margin-bottom: 16px;
 }
 
-.card-rarity.common { color: var(--common); }
-.card-rarity.rare { color: var(--rare); }
-.card-rarity.epic { color: var(--epic); }
-.card-rarity.legendary { color: var(--legendary); }
+.card-rarity.common {
+    color: var(--common);
+}
+
+.card-rarity.rare {
+    color: var(--rare);
+}
+
+.card-rarity.epic {
+    color: var(--epic);
+}
+
+.card-rarity.legendary {
+    color: var(--legendary);
+}
 
 .modal-close {
     padding: 12px 32px;
@@ -1127,15 +1242,15 @@ body {
         flex-wrap: wrap;
         gap: 12px;
     }
-    
+
     .order-section {
         padding: 12px;
     }
-    
+
     .chests-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .collection-grid {
         grid-template-columns: repeat(2, 1fr);
     }
