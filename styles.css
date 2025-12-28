@@ -1,0 +1,1142 @@
+/* ============================================
+   🔥 МЕМКОИНЫ - NFT Exchange Styles
+   Binance-style dark theme
+   ============================================ */
+
+:root {
+    /* Colors - Binance inspired */
+    --bg-primary: #0b0e11;
+    --bg-secondary: #1e2329;
+    --bg-tertiary: #2b3139;
+    --bg-hover: #363c45;
+    
+    --text-primary: #eaecef;
+    --text-secondary: #848e9c;
+    --text-muted: #5e6673;
+    
+    --accent-gold: #f0b90b;
+    --accent-gold-hover: #fcd535;
+    
+    --green: #0ecb81;
+    --green-bg: rgba(14, 203, 129, 0.1);
+    --red: #f6465d;
+    --red-bg: rgba(246, 70, 93, 0.1);
+    
+    /* Rarity colors */
+    --common: #9aa4af;
+    --rare: #3b82f6;
+    --epic: #a855f7;
+    --legendary: #f59e0b;
+    
+    /* Spacing */
+    --nav-height: 60px;
+    --header-height: 56px;
+    
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent-gold), #fcd535);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.balance-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.balance-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--green);
+}
+
+.profile-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+}
+
+.profile-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    margin-top: var(--header-height);
+    margin-bottom: var(--nav-height);
+    overflow-y: auto;
+}
+
+.page {
+    display: none;
+    min-height: calc(100vh - var(--header-height) - var(--nav-height));
+}
+
+.page.active {
+    display: block;
+}
+
+.page-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.page-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ============================================
+   Exchange Layout
+   ============================================ */
+
+.exchange-layout {
+    display: grid;
+    grid-template-columns: 140px 1fr 200px;
+    gap: 1px;
+    background: var(--bg-tertiary);
+    min-height: calc(100vh - var(--header-height) - var(--nav-height));
+}
+
+@media (max-width: 768px) {
+    .exchange-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+    
+    .trading-pairs {
+        display: none;
+    }
+    
+    .orderbook {
+        order: 2;
+    }
+}
+
+/* Trading Pairs Sidebar */
+.trading-pairs {
+    background: var(--bg-secondary);
+    overflow-y: auto;
+}
+
+.pairs-header {
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.pair-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.pair-item:hover,
+.pair-item.active {
+    background: var(--bg-hover);
+}
+
+.pair-item.active {
+    border-left: 2px solid var(--accent-gold);
+}
+
+.pair-item .emoji {
+    font-size: 20px;
+}
+
+.pair-item .info {
+    flex: 1;
+}
+
+.pair-item .name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pair-item .price {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.pair-item .change {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.pair-item .change.positive { color: var(--green); }
+.pair-item .change.negative { color: var(--red); }
+
+/* Chart Section */
+.chart-section {
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+}
+
+.pair-info {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.pair-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.pair-emoji {
+    font-size: 28px;
+}
+
+.pair-name {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.pair-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green);
+}
+
+.pair-change {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.pair-change.positive {
+    color: var(--green);
+    background: var(--green-bg);
+}
+
+.pair-change.negative {
+    color: var(--red);
+    background: var(--red-bg);
+}
+
+.pair-stats {
+    display: flex;
+    gap: 24px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Timeframe Selector */
+.timeframe-selector {
+    display: flex;
+    gap: 4px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.tf-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.tf-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+}
+
+.tf-btn.active {
+    color: var(--accent-gold);
+    background: rgba(240, 185, 11, 0.1);
+}
+
+/* Chart Container */
+.chart-container {
+    flex: 1;
+    min-height: 300px;
+    padding: 8px;
+}
+
+/* Order Section */
+.order-section {
+    border-top: 1px solid var(--bg-tertiary);
+    padding: 12px 16px;
+}
+
+.order-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.order-tab {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.order-tab.active[data-side="buy"] {
+    background: var(--green);
+    color: white;
+}
+
+.order-tab.active[data-side="sell"] {
+    background: var(--red);
+    color: white;
+}
+
+.order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.order-type-selector {
+    display: flex;
+    gap: 16px;
+}
+
+.order-type {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.order-type.active {
+    color: var(--text-primary);
+}
+
+.order-type input {
+    display: none;
+}
+
+.order-type span::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.order-type.active span::before {
+    border-color: var(--accent-gold);
+    background: var(--accent-gold);
+}
+
+.order-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.order-input-group label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.input-with-unit input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+}
+
+.input-with-unit input::placeholder {
+    color: var(--text-muted);
+}
+
+.input-with-unit .unit {
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.order-quick-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.quick-btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 8px 0;
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.order-total span:last-child {
+    font-weight: 600;
+    color: var(--accent-gold);
+}
+
+.order-submit {
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.order-submit.buy-btn {
+    background: var(--green);
+    color: white;
+}
+
+.order-submit.sell-btn {
+    background: var(--red);
+    color: white;
+}
+
+.order-submit:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+
+/* ============================================
+   Order Book
+   ============================================ */
+
+.orderbook {
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.orderbook-header {
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.orderbook-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 8px 12px;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.orderbook-asks,
+.orderbook-bids {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.orderbook-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 4px 12px;
+    font-size: 11px;
+    position: relative;
+    cursor: pointer;
+}
+
+.orderbook-row:hover {
+    background: var(--bg-hover);
+}
+
+.orderbook-row .depth {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    opacity: 0.15;
+}
+
+.orderbook-asks .orderbook-row .price { color: var(--red); }
+.orderbook-asks .orderbook-row .depth { background: var(--red); }
+
+.orderbook-bids .orderbook-row .price { color: var(--green); }
+.orderbook-bids .orderbook-row .depth { background: var(--green); }
+
+.orderbook-spread {
+    padding: 8px 12px;
+    text-align: center;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--bg-tertiary);
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.spread-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+}
+
+.spread-label {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Recent Trades */
+.recent-trades {
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.trades-header {
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.trades-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.trade-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 4px 12px;
+    font-size: 11px;
+}
+
+.trade-row .price.buy { color: var(--green); }
+.trade-row .price.sell { color: var(--red); }
+.trade-row .time { color: var(--text-muted); text-align: right; }
+
+/* ============================================
+   Chests Page
+   ============================================ */
+
+.chests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.chest-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    border: 1px solid var(--bg-tertiary);
+    transition: all 0.3s;
+}
+
+.chest-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-gold);
+}
+
+.chest-card.free { border-top: 3px solid var(--common); }
+.chest-card.premium { border-top: 3px solid var(--rare); }
+.chest-card.legendary { border-top: 3px solid var(--legendary); }
+
+.chest-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.chest-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.chest-timer {
+    font-size: 14px;
+    color: var(--green);
+    margin-bottom: 12px;
+}
+
+.chest-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-gold);
+    margin-bottom: 12px;
+}
+
+.chest-odds {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.chest-odds span {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.chest-odds .common { color: var(--common); background: rgba(154, 164, 175, 0.1); }
+.chest-odds .rare { color: var(--rare); background: rgba(59, 130, 246, 0.1); }
+.chest-odds .epic { color: var(--epic); background: rgba(168, 85, 247, 0.1); }
+.chest-odds .legendary { color: var(--legendary); background: rgba(245, 158, 11, 0.1); }
+
+.chest-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--accent-gold), #fcd535);
+    border: none;
+    border-radius: var(--radius-md);
+    color: #0b0e11;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chest-btn:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+/* ============================================
+   Collection Page
+   ============================================ */
+
+.collection-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+.card-item {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.card-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-gold);
+}
+
+.card-item.common { border-top: 3px solid var(--common); }
+.card-item.rare { border-top: 3px solid var(--rare); }
+.card-item.epic { border-top: 3px solid var(--epic); }
+.card-item.legendary { border-top: 3px solid var(--legendary); }
+
+.card-item .emoji {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.card-item .name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.card-item .rarity {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.card-item.common .rarity { color: var(--common); }
+.card-item.rare .rarity { color: var(--rare); }
+.card-item.epic .rarity { color: var(--epic); }
+.card-item.legendary .rarity { color: var(--legendary); }
+
+.card-item .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--green);
+}
+
+/* ============================================
+   Battles Page
+   ============================================ */
+
+.battles-content {
+    padding: 16px;
+}
+
+.battle-info {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.battle-info p {
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.battle-warning {
+    color: var(--red) !important;
+    font-weight: 600;
+}
+
+.battle-select {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.battle-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.battle-card:hover {
+    border-color: var(--accent-gold);
+}
+
+.battle-card.selected {
+    border-color: var(--accent-gold);
+    background: rgba(240, 185, 11, 0.1);
+}
+
+.battle-card .emoji {
+    font-size: 36px;
+}
+
+.battle-card .name {
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+.battle-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    background: linear-gradient(90deg, var(--red), #ff6b6b);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.battle-btn:disabled {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.battle-btn:not(:disabled):hover {
+    transform: scale(1.02);
+}
+
+/* ============================================
+   Profile Page
+   ============================================ */
+
+.profile-content {
+    padding: 16px;
+}
+
+.profile-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 16px;
+}
+
+.profile-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+}
+
+.profile-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-stat .stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.profile-stat .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn.deposit {
+    background: var(--green);
+    color: white;
+}
+
+.action-btn.withdraw {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   Bottom Navigation
+   ============================================ */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--bg-tertiary);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+    color: var(--accent-gold);
+}
+
+.nav-icon {
+    font-size: 22px;
+}
+
+.nav-label {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+/* ============================================
+   Modal
+   ============================================ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+}
+
+.chest-animation {
+    font-size: 100px;
+    animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.revealed-card {
+    font-size: 80px;
+    margin-bottom: 16px;
+    animation: reveal 0.5s ease-out;
+}
+
+@keyframes reveal {
+    from { transform: scale(0) rotate(180deg); opacity: 0; }
+    to { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.card-rarity {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.card-rarity.common { color: var(--common); }
+.card-rarity.rare { color: var(--rare); }
+.card-rarity.epic { color: var(--epic); }
+.card-rarity.legendary { color: var(--legendary); }
+
+.modal-close {
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--accent-gold);
+    border: none;
+    border-radius: var(--radius-md);
+    color: #0b0e11;
+    cursor: pointer;
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================
+   Mobile Responsiveness
+   ============================================ */
+
+@media (max-width: 480px) {
+    .pair-stats {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .order-section {
+        padding: 12px;
+    }
+    
+    .chests-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .collection-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
