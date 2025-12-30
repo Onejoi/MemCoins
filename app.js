@@ -728,12 +728,22 @@ function openChest(type) {
             ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
             : `🖼️`;
 
+        const price = state.prices[meme.id].current * RARITIES[rarity].multiplier;
+
         document.getElementById('revealedCard').innerHTML = `
-            <div class="revealed-info">
-                <div class="rev-series">#${card.serialNumber}</div>
-                ${iconHtml}
+            <div class="revealed-info ${rarity}">
+                <div class="rev-header">
+                    <div class="rev-series">#${card.serialNumber}</div>
+                    <div class="rev-rarity-pill ${rarity}">${rarity.toUpperCase()}</div>
+                </div>
+                <div class="rev-image-wrap">
+                    ${iconHtml}
+                </div>
                 <div class="rev-name">${meme.name}</div>
-                <div class="rev-rarity ${rarity}">${rarity.toUpperCase()}</div>
+                <div class="rev-price">
+                    <span class="label">Рыночная цена:</span>
+                    <div class="price-value">⭐ ${Math.round(price)}</div>
+                </div>
             </div>
         `;
 
