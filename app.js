@@ -20,10 +20,10 @@ const MEME_TYPES = [
 ];
 
 const RARITIES = {
-    common: { name: 'Common', multiplier: 1.0, color: '#9aa4af', maxSeries: 1000 },
-    rare: { name: 'Rare', multiplier: 2.0, color: '#3b82f6', maxSeries: 250 },
-    epic: { name: 'Epic', multiplier: 5.0, color: '#a855f7', maxSeries: 50 },
-    legendary: { name: 'Legendary', multiplier: 15.0, color: '#f59e0b', maxSeries: 5 }
+    common: { name: 'Common', multiplier: 1.0, color: '#3d3d3d', bg: '#4d4d4d', maxSeries: 100000 },
+    rare: { name: 'Rare', multiplier: 2.0, color: '#22c55e', bg: '#1b4d2e', maxSeries: 10000 },
+    epic: { name: 'Epic', multiplier: 5.0, color: '#a855f7', bg: '#3b255a', maxSeries: 1000 },
+    legendary: { name: 'Legendary', multiplier: 15.0, color: '#f59e0b', bg: '#5a3d0b', maxSeries: 100 }
 };
 
 // App State
@@ -518,13 +518,21 @@ function renderCollection() {
         const maxSupply = rarity.maxSeries;
 
         return `
-            <div class="card-item ${card.rarity}">
-                <div class="card-series">#${String(card.serialNumber).padStart(3, '0')}</div>
-                ${iconHtml}
-                <div class="name">${meme.name}</div>
-                <div class="rarity">${rarity.name}</div>
-                <div class="card-supply">Supply: ${supply}/${maxSupply}</div>
-                <div class="value">${formatPrice(price)}</div>
+            <div class="card-item tg-style ${card.rarity}">
+                <div class="card-header">
+                    <div class="rarity-icon">💎</div>
+                    <div class="card-series">#${card.serialNumber}</div>
+                </div>
+                <div class="card-image-wrap">
+                    ${iconHtml}
+                </div>
+                <div class="card-info">
+                    <div class="name">${meme.name}</div>
+                    <div class="price-pill">
+                        <span class="currency">⭐</span>
+                        ${Math.round(price)}
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
@@ -553,8 +561,8 @@ function renderBattleCards() {
             : `<div class="emoji">🖼️</div>`;
 
         return `
-            <div class="battle-card" data-card-id="${card.id}" onclick="selectBattleCard('${card.id}')">
-                <div class="card-series-mini">#${String(card.serialNumber).padStart(3, '0')}</div>
+            <div class="battle-card ${card.rarity}" data-card-id="${card.id}" onclick="selectBattleCard('${card.id}')">
+                <div class="card-series-mini">#${card.serialNumber}</div>
                 ${iconHtml}
                 <div class="name">${meme.name}</div>
             </div>
@@ -720,10 +728,14 @@ function openChest(type) {
             ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
             : `🖼️`;
 
-        document.getElementById('revealedCard').innerHTML = iconHtml;
-        const rarityEl = document.getElementById('cardRarity');
-        rarityEl.textContent = meme.name;
-        rarityEl.className = 'card-rarity';
+        document.getElementById('revealedCard').innerHTML = `
+            <div class="revealed-info">
+                <div class="rev-series">#${card.serialNumber}</div>
+                ${iconHtml}
+                <div class="rev-name">${meme.name}</div>
+                <div class="rev-rarity ${rarity}">${rarity.toUpperCase()}</div>
+            </div>
+        `;
 
         renderCollection();
     }, 1500);
