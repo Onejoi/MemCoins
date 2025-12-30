@@ -880,16 +880,6 @@ body {
     padding: 16px;
 }
 
-.card-item {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    text-align: center;
-    border: 1px solid var(--bg-tertiary);
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
 .card-item:hover {
     transform: translateY(-4px);
     border-color: var(--accent-gold);
@@ -909,6 +899,39 @@ body {
 
 .card-item.legendary {
     border-top: 3px solid var(--legendary);
+}
+
+.card-series {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--bg-primary);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.card-series-mini {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.card-item {
+    position: relative;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+    transition: all 0.3s;
+    overflow: hidden;
 }
 
 .card-item .emoji,
@@ -951,6 +974,12 @@ body {
 
 .card-item.legendary .rarity {
     color: var(--legendary);
+}
+
+.card-supply {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
 }
 
 .card-item .value {
