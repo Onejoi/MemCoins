@@ -8,18 +8,22 @@
 // ============================================
 
 const MEME_TYPES = [
-    { id: 'fighter', name: 'Бомж Файтер', emoji: '🥊', image: 'images/fighter.png', basePrice: 800, color: '#ef4444' },
-    { id: 'cat', name: 'Грустный Кот', emoji: '😿', image: null, basePrice: 400, color: '#3b82f6' },
-    { id: 'trader', name: 'Успешный Трейдер', emoji: '📈', image: null, basePrice: 600, color: '#22c55e' },
-    { id: 'hacker', name: 'Дедушка Хакер', emoji: '👴', image: null, basePrice: 300, color: '#a855f7' },
-    { id: 'dog', name: 'Собака в Костюме', emoji: '🐕', image: null, basePrice: 500, color: '#f59e0b' }
+    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', basePrice: 800, color: '#ef4444' },
+    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', basePrice: 420, color: '#22c55e' },
+    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', basePrice: 1000, color: '#f59e0b' },
+    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', basePrice: 200, color: '#3b82f6' },
+    { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', basePrice: 2500, color: '#a855f7' },
+    { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', basePrice: 350, color: '#ef4444' },
+    { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', basePrice: 150, color: '#f59e0b' },
+    { id: 'stonks', name: 'Стонкс Мэн', image: 'images/stonks.png', basePrice: 700, color: '#22c55e' }
+    // Сюда можно добавлять еще и еще...
 ];
 
 const RARITIES = {
-    common: { name: 'Common', multiplier: 1.0, color: '#9aa4af' },
-    rare: { name: 'Rare', multiplier: 1.5, color: '#3b82f6' },
-    epic: { name: 'Epic', multiplier: 2.5, color: '#a855f7' },
-    legendary: { name: 'Legendary', multiplier: 5.0, color: '#f59e0b' }
+    common: { name: 'Common', multiplier: 1.0, color: '#9aa4af', maxSeries: 1000 },
+    rare: { name: 'Rare', multiplier: 2.0, color: '#3b82f6', maxSeries: 250 },
+    epic: { name: 'Epic', multiplier: 5.0, color: '#a855f7', maxSeries: 50 },
+    legendary: { name: 'Legendary', multiplier: 15.0, color: '#f59e0b', maxSeries: 5 }
 };
 
 // App State
@@ -32,7 +36,8 @@ const state = {
     prices: {},
     priceHistory: {},
     orderbook: {},
-    trades: {}
+    trades: {},
+    supply: {} // Tracks total minted cards per ID: { 'fighter_common': 42 }
 };
 
 // ============================================
@@ -58,6 +63,31 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updatePrices, 3000);
     setInterval(addRandomTrade, 5000);
 });
+
+function mintCard(memeId, rarity, serialNum) {
+    const r = rarity || getRandomRarity();
+    const s = serialNum || generateSerialNumber(r);
+
+    // Update global supply
+    const supplyKey = `${memeId}_${r}`;
+    state.supply[supplyKey] = (state.supply[supplyKey] || 0) + 1;
+
+    const newCard = {
+        id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        memeType: memeId,
+        rarity: r,
+        serialNumber: s,
+        acquiredAt: new Date()
+    };
+
+    state.collection.push(newCard);
+    return newCard;
+}
+
+function getGlobalSupply(memeId, rarity) {
+    const supplyKey = `${memeId}_${rarity}`;
+    return state.supply[supplyKey] || 0;
+}
 
 // ============================================
 // Telegram Web App Integration
@@ -315,10 +345,10 @@ function renderTradingPairs() {
         const changeClass = priceData.change24h >= 0 ? 'positive' : 'negative';
         const changeSign = priceData.change24h >= 0 ? '+' : '';
 
-        // Use image if available, otherwise emoji
+        // Use image if available, fallback to a placeholder if not
         const iconHtml = meme.image
-            ? `<img src="${meme.image}" class="meme-icon" alt="${meme.name}">`
-            : `<span class="emoji">${meme.emoji}</span>`;
+            ? `<img src="${meme.image}" class="meme-icon" onerror="this.src='https://via.placeholder.com/24?text=?'">`
+            : `<span class="emoji">🖼️</span>`;
 
         return `
             <div class="pair-item ${state.currentPair === meme.id ? 'active' : ''}" 
@@ -467,19 +497,10 @@ function updateChart() {
 // ============================================
 
 function initCollection() {
-    // Add some initial cards
-    const rarities = ['common', 'common', 'common', 'rare', 'rare', 'epic'];
-
-    for (let i = 0; i < 12; i++) {
+    // Add some initial random cards
+    for (let i = 0; i < 8; i++) {
         const meme = MEME_TYPES[Math.floor(Math.random() * MEME_TYPES.length)];
-        const rarity = rarities[Math.floor(Math.random() * rarities.length)];
-
-        state.collection.push({
-            id: `card_${i}`,
-            memeType: meme.id,
-            rarity: rarity,
-            acquiredAt: new Date()
-        });
+        mintCard(meme.id);
     }
 }
 
@@ -491,13 +512,18 @@ function renderCollection() {
 
         const iconHtml = meme.image
             ? `<img src="${meme.image}" class="card-icon" alt="${meme.name}">`
-            : `<div class="emoji">${meme.emoji}</div>`;
+            : `<div class="emoji">🖼️</div>`;
+
+        const supply = getGlobalSupply(card.memeType, card.rarity);
+        const maxSupply = rarity.maxSeries;
 
         return `
             <div class="card-item ${card.rarity}">
+                <div class="card-series">#${String(card.serialNumber).padStart(3, '0')}</div>
                 ${iconHtml}
                 <div class="name">${meme.name}</div>
                 <div class="rarity">${rarity.name}</div>
+                <div class="card-supply">Supply: ${supply}/${maxSupply}</div>
                 <div class="value">${formatPrice(price)}</div>
             </div>
         `;
@@ -507,7 +533,6 @@ function renderCollection() {
 
     // Update stats
     const totalValue = state.collection.reduce((sum, card) => {
-        const meme = MEME_TYPES.find(m => m.id === card.memeType);
         const rarity = RARITIES[card.rarity];
         return sum + state.prices[card.memeType].current * rarity.multiplier;
     }, 0);
@@ -522,16 +547,16 @@ function renderCollection() {
 function renderBattleCards() {
     const html = state.collection.map(card => {
         const meme = MEME_TYPES.find(m => m.id === card.memeType);
-        const rarity = RARITIES[card.rarity];
 
         const iconHtml = meme.image
             ? `<img src="${meme.image}" class="battle-icon" alt="${meme.name}">`
-            : `<div class="emoji">${meme.emoji}</div>`;
+            : `<div class="emoji">🖼️</div>`;
 
         return `
             <div class="battle-card" data-card-id="${card.id}" onclick="selectBattleCard('${card.id}')">
+                <div class="card-series-mini">#${String(card.serialNumber).padStart(3, '0')}</div>
                 ${iconHtml}
-                <div class="name">${rarity.name}</div>
+                <div class="name">${meme.name}</div>
             </div>
         `;
     }).join('');
@@ -628,13 +653,7 @@ function submitOrder() {
 
         // Add cards to collection
         for (let i = 0; i < amount; i++) {
-            const rarity = getRandomRarity();
-            state.collection.push({
-                id: `card_${Date.now()}_${i}`,
-                memeType: state.currentPair,
-                rarity: rarity,
-                acquiredAt: new Date()
-            });
+            mintCard(state.currentPair);
         }
 
         alert(`✅ Куплено ${amount} карточек за ${formatPrice(total)}`);
@@ -664,10 +683,15 @@ function submitOrder() {
 
 function getRandomRarity() {
     const rand = Math.random();
-    if (rand < 0.6) return 'common';
-    if (rand < 0.85) return 'rare';
-    if (rand < 0.97) return 'epic';
+    if (rand < 0.75) return 'common';
+    if (rand < 0.93) return 'rare';
+    if (rand < 0.99) return 'epic';
     return 'legendary';
+}
+
+function generateSerialNumber(rarity) {
+    const max = RARITIES[rarity].maxSeries;
+    return Math.floor(Math.random() * max) + 1;
 }
 
 // ============================================
@@ -683,34 +707,9 @@ function openChest(type) {
     animation.style.display = 'block';
     reveal.style.display = 'none';
 
-    // Determine rarity based on chest type
-    let rarity;
-    const rand = Math.random();
-
-    if (type === 'free') {
-        if (rand < 0.5) rarity = 'common';
-        else if (rand < 0.8) rarity = 'rare';
-        else if (rand < 0.95) rarity = 'epic';
-        else rarity = 'legendary';
-    } else if (type === 'premium') {
-        if (rand < 0.2) rarity = 'common';
-        else if (rand < 0.6) rarity = 'rare';
-        else if (rand < 0.9) rarity = 'epic';
-        else rarity = 'legendary';
-    } else { // legendary chest
-        if (rand < 0.7) rarity = 'epic';
-        else rarity = 'legendary';
-    }
-
     const meme = MEME_TYPES[Math.floor(Math.random() * MEME_TYPES.length)];
-
-    // Add to collection
-    state.collection.push({
-        id: `card_${Date.now()}`,
-        memeType: meme.id,
-        rarity: rarity,
-        acquiredAt: new Date()
-    });
+    const rarity = getRandomRarity();
+    const card = mintCard(meme.id, rarity);
 
     // Animate
     setTimeout(() => {
@@ -719,12 +718,12 @@ function openChest(type) {
 
         const iconHtml = meme.image
             ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
-            : meme.emoji;
+            : `🖼️`;
 
         document.getElementById('revealedCard').innerHTML = iconHtml;
         const rarityEl = document.getElementById('cardRarity');
-        rarityEl.textContent = RARITIES[rarity].name;
-        rarityEl.className = `card-rarity ${rarity}`;
+        rarityEl.textContent = meme.name;
+        rarityEl.className = 'card-rarity';
 
         renderCollection();
     }, 1500);
