@@ -8,11 +8,11 @@
 // ============================================
 
 const MEME_TYPES = [
-    { id: 'fighter', name: 'Бомж Файтер', emoji: '🥊', basePrice: 800, color: '#ef4444' },
-    { id: 'cat', name: 'Грустный Кот', emoji: '😿', basePrice: 400, color: '#3b82f6' },
-    { id: 'trader', name: 'Успешный Трейдер', emoji: '📈', basePrice: 600, color: '#22c55e' },
-    { id: 'hacker', name: 'Дедушка Хакер', emoji: '👴', basePrice: 300, color: '#a855f7' },
-    { id: 'dog', name: 'Собака в Костюме', emoji: '🐕', basePrice: 500, color: '#f59e0b' }
+    { id: 'fighter', name: 'Бомж Файтер', emoji: '🥊', image: 'images/fighter.png', basePrice: 800, color: '#ef4444' },
+    { id: 'cat', name: 'Грустный Кот', emoji: '😿', image: null, basePrice: 400, color: '#3b82f6' },
+    { id: 'trader', name: 'Успешный Трейдер', emoji: '📈', image: null, basePrice: 600, color: '#22c55e' },
+    { id: 'hacker', name: 'Дедушка Хакер', emoji: '👴', image: null, basePrice: 300, color: '#a855f7' },
+    { id: 'dog', name: 'Собака в Костюме', emoji: '🐕', image: null, basePrice: 500, color: '#f59e0b' }
 ];
 
 const RARITIES = {
@@ -315,10 +315,15 @@ function renderTradingPairs() {
         const changeClass = priceData.change24h >= 0 ? 'positive' : 'negative';
         const changeSign = priceData.change24h >= 0 ? '+' : '';
 
+        // Use image if available, otherwise emoji
+        const iconHtml = meme.image
+            ? `<img src="${meme.image}" class="meme-icon" alt="${meme.name}">`
+            : `<span class="emoji">${meme.emoji}</span>`;
+
         return `
             <div class="pair-item ${state.currentPair === meme.id ? 'active' : ''}" 
                  onclick="selectPair('${meme.id}')">
-                <span class="emoji">${meme.emoji}</span>
+                ${iconHtml}
                 <div class="info">
                     <div class="name">${meme.id.toUpperCase()}</div>
                     <div class="price">${formatPrice(priceData.current)}</div>
@@ -347,7 +352,11 @@ function updateCurrentPairInfo() {
     const changeClass = priceData.change24h >= 0 ? 'positive' : 'negative';
     const changeSign = priceData.change24h >= 0 ? '+' : '';
 
-    document.getElementById('currentEmoji').textContent = meme.emoji;
+    const iconHtml = meme.image
+        ? `<img src="${meme.image}" class="pair-icon" alt="${meme.name}">`
+        : meme.emoji;
+
+    document.getElementById('currentEmoji').innerHTML = iconHtml;
     document.getElementById('currentPairName').textContent = meme.id.toUpperCase();
     document.getElementById('currentPrice').textContent = formatPrice(priceData.current);
 
@@ -480,9 +489,13 @@ function renderCollection() {
         const rarity = RARITIES[card.rarity];
         const price = state.prices[card.memeType].current * rarity.multiplier;
 
+        const iconHtml = meme.image
+            ? `<img src="${meme.image}" class="card-icon" alt="${meme.name}">`
+            : `<div class="emoji">${meme.emoji}</div>`;
+
         return `
             <div class="card-item ${card.rarity}">
-                <div class="emoji">${meme.emoji}</div>
+                ${iconHtml}
                 <div class="name">${meme.name}</div>
                 <div class="rarity">${rarity.name}</div>
                 <div class="value">${formatPrice(price)}</div>
@@ -511,9 +524,13 @@ function renderBattleCards() {
         const meme = MEME_TYPES.find(m => m.id === card.memeType);
         const rarity = RARITIES[card.rarity];
 
+        const iconHtml = meme.image
+            ? `<img src="${meme.image}" class="battle-icon" alt="${meme.name}">`
+            : `<div class="emoji">${meme.emoji}</div>`;
+
         return `
             <div class="battle-card" data-card-id="${card.id}" onclick="selectBattleCard('${card.id}')">
-                <div class="emoji">${meme.emoji}</div>
+                ${iconHtml}
                 <div class="name">${rarity.name}</div>
             </div>
         `;
@@ -700,7 +717,11 @@ function openChest(type) {
         animation.style.display = 'none';
         reveal.style.display = 'block';
 
-        document.getElementById('revealedCard').textContent = meme.emoji;
+        const iconHtml = meme.image
+            ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
+            : meme.emoji;
+
+        document.getElementById('revealedCard').innerHTML = iconHtml;
         const rarityEl = document.getElementById('cardRarity');
         rarityEl.textContent = RARITIES[rarity].name;
         rarityEl.className = `card-rarity ${rarity}`;
