@@ -905,11 +905,15 @@ body {
 .card-item.tg-style {
     display: flex;
     flex-direction: column;
-    padding: 12px;
-    height: 240px;
+    padding: 0 !important;
+    /* Force zero padding */
+    height: auto;
+    min-height: 200px;
+    border-radius: 20px;
     border: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
 }
 
 .card-item.tg-style.common {
@@ -933,7 +937,10 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-bottom: 10px;
+    padding: 12px 12px 0 12px;
+    /* Add padding to header only */
+    box-sizing: border-box;
+    margin-bottom: 8px;
 }
 
 .rarity-icon {
@@ -957,26 +964,38 @@ body {
 }
 
 .card-image-wrap {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;
+    width: 100%;
+    margin: 0;
+    /* No margins, touch edges! */
+    aspect-ratio: 1 / 1;
+    display: block;
+    /* Simpler than flex for full fill */
+    overflow: hidden;
 }
 
 .card-image-wrap img,
-.card-image-wrap .emoji {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
+.card-image-wrap .emoji,
+.card-icon,
+.revealed-icon,
+.battle-icon {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: cover;
+    border: none;
+    margin: 0;
+    padding: 0;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
 }
 
 .card-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
+    padding: 8px 12px 12px 12px;
+    /* Padding for info text */
+    box-sizing: border-box;
 }
 
 .card-info .name {
@@ -1037,12 +1056,16 @@ body {
 
 .battle-card {
     background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    padding: 16px;
+    border-radius: 16px;
+    padding: 0;
+    /* Full bleed image */
     text-align: center;
     border: 2px solid transparent;
     cursor: pointer;
     transition: all 0.2s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .battle-card:hover {
@@ -1082,22 +1105,14 @@ body {
     display: inline-block;
 }
 
-.battle-card .emoji,
-.battle-icon {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-    font-size: 24px;
+.battle-card .name {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 4px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
-}
-
-.battle-card .name {
-    font-size: 11px;
-    margin-top: 8px;
 }
 
 .battle-btn {
@@ -1286,6 +1301,18 @@ body {
     text-align: center;
     max-width: 320px;
     width: 90%;
+    overflow: hidden;
+    /* Ensure content doesn't leak */
+}
+
+.modal-content.chest-reveal {
+    padding: 0;
+    max-width: 340px;
+    /* Slightly wider to let card breathe */
+    width: 95%;
+    background: transparent;
+    box-shadow: none;
+    /* Let card handle shadow */
 }
 
 .chest-animation {
@@ -1306,21 +1333,14 @@ body {
 }
 
 .revealed-card {
-    font-size: 80px;
-    margin-bottom: 20px;
+    width: 100%;
     animation: reveal 0.5s ease-out;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.revealed-icon {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 0 30px rgba(240, 185, 11, 0.3);
-}
+
 
 @keyframes reveal {
     from {
@@ -1338,12 +1358,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 24px;
+    gap: 0;
+    padding: 0 !important;
     border-radius: 24px;
-    width: 280px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    /* Fill the 340px modal content */
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+    position: relative;
 }
 
 .revealed-info.common {
@@ -1367,23 +1390,25 @@ body {
     justify-content: space-between;
     width: 100%;
     align-items: center;
-    margin-bottom: 5px;
+    padding: 15px 15px 5px 15px;
+    /* Add padding only here */
+    box-sizing: border-box;
 }
 
 .rev-series {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     background: rgba(0, 0, 0, 0.3);
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .rev-rarity-pill {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     padding: 2px 10px;
-    border-radius: 10px;
+    border-radius: 8px;
     color: white;
 }
 
@@ -1404,32 +1429,37 @@ body {
 }
 
 .rev-image-wrap {
-    width: 160px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 1 / 1;
+    display: block;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    /* Darker background for contrast */
 }
 
+/* Revealed icon is already handled by the unified rule above, but let's be safe */
 .revealed-icon {
-    width: 140px;
-    height: 140px;
-    object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
-    border-radius: 15px;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
 }
 
 .rev-name {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 800;
     color: white;
     text-transform: uppercase;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 12px 0 4px;
+    text-align: center;
+    width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
 }
 
 .rev-price {
     text-align: center;
-    margin-top: 5px;
+    padding-bottom: 5px;
 }
 
 .rev-price .label {
@@ -1441,21 +1471,31 @@ body {
 }
 
 .rev-price .price-value {
-    font-size: 22px;
+    font-size: 26px;
+    /* Bigger price */
     font-weight: 800;
     color: #fcd535;
-    text-shadow: 0 0 10px rgba(252, 213, 53, 0.3);
+    text-shadow: 0 0 15px rgba(252, 213, 53, 0.4);
+    margin-top: -2px;
 }
 
 .modal-close {
-    padding: 12px 32px;
-    font-size: 16px;
-    font-weight: 600;
-    background: var(--accent-gold);
+    width: calc(100% - 40px);
+    margin: 10px 20px 20px 20px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 800;
+    background: #fcd535;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: 16px;
     color: #0b0e11;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(252, 213, 53, 0.3);
+    transition: all 0.1s;
+}
+
+.modal-close:active {
+    transform: scale(0.98);
 }
 
 /* ============================================
