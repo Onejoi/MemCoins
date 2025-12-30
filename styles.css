@@ -256,8 +256,16 @@ body {
     border-left: 2px solid var(--accent-gold);
 }
 
-.pair-item .emoji {
+.pair-item .emoji,
+.pair-item .meme-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
     font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pair-item .info {
@@ -309,8 +317,16 @@ body {
     margin-bottom: 8px;
 }
 
-.pair-emoji {
+.pair-emoji,
+.pair-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
     font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pair-name {
@@ -895,9 +911,17 @@ body {
     border-top: 3px solid var(--legendary);
 }
 
-.card-item .emoji {
+.card-item .emoji,
+.card-icon {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
     font-size: 48px;
-    margin-bottom: 8px;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-item .name {
@@ -984,8 +1008,17 @@ body {
     background: rgba(240, 185, 11, 0.1);
 }
 
-.battle-card .emoji {
-    font-size: 36px;
+.battle-card .emoji,
+.battle-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
 }
 
 .battle-card .name {
@@ -1200,8 +1233,19 @@ body {
 
 .revealed-card {
     font-size: 80px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     animation: reveal 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.revealed-icon {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 30px rgba(240, 185, 11, 0.3);
 }
 
 @keyframes reveal {
