@@ -901,91 +901,108 @@ body {
     border-top: 3px solid var(--legendary);
 }
 
-.card-series {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-    background: var(--bg-primary);
-    padding: 2px 4px;
-    border-radius: 4px;
+/* Telegram Style Cards */
+.card-item.tg-style {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    height: 240px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card-series-mini {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    font-size: 8px;
-    font-weight: 700;
-    color: var(--text-muted);
+.card-item.tg-style.common {
+    background: linear-gradient(135deg, #2c3e50, #000000);
 }
 
-.card-item {
-    position: relative;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    text-align: center;
-    border: 1px solid var(--bg-tertiary);
-    cursor: pointer;
-    transition: all 0.3s;
-    overflow: hidden;
+.card-item.tg-style.rare {
+    background: linear-gradient(135deg, #27ae60, #1b3d26);
 }
 
-.card-item .emoji,
-.card-icon {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    font-size: 48px;
-    margin: 0 auto 8px;
+.card-item.tg-style.epic {
+    background: linear-gradient(135deg, #8e44ad, #2c1a36);
+}
+
+.card-item.tg-style.legendary {
+    background: linear-gradient(135deg, #f39c12, #5a3d0b);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.rarity-icon {
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.card-item .name {
     font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 4px;
 }
 
-.card-item .rarity {
-    font-size: 10px;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 8px;
+.card-series {
+    position: static;
+    background: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
 }
 
-.card-item.common .rarity {
-    color: var(--common);
+.card-image-wrap {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
 }
 
-.card-item.rare .rarity {
-    color: var(--rare);
+.card-image-wrap img,
+.card-image-wrap .emoji {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
 }
 
-.card-item.epic .rarity {
-    color: var(--epic);
+.card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
-.card-item.legendary .rarity {
-    color: var(--legendary);
-}
-
-.card-supply {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-
-.card-item .value {
+.card-info .name {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--green);
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.price-pill {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.price-pill .currency {
+    color: #fcd535;
 }
 
 /* ============================================
@@ -1032,9 +1049,37 @@ body {
     border-color: var(--accent-gold);
 }
 
+.battle-card.common {
+    background: linear-gradient(135deg, #2c3e50, #000000);
+}
+
+.battle-card.rare {
+    background: linear-gradient(135deg, #27ae60, #1b3d26);
+}
+
+.battle-card.epic {
+    background: linear-gradient(135deg, #8e44ad, #2c1a36);
+}
+
+.battle-card.legendary {
+    background: linear-gradient(135deg, #f39c12, #5a3d0b);
+}
+
 .battle-card.selected {
-    border-color: var(--accent-gold);
-    background: rgba(240, 185, 11, 0.1);
+    border-color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.card-series-mini {
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 4px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    display: inline-block;
 }
 
 .battle-card .emoji,
@@ -1289,27 +1334,54 @@ body {
     }
 }
 
-.card-rarity {
-    font-size: 18px;
+.revealed-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.rev-series {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-muted);
+}
+
+.rev-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+}
+
+.rev-rarity {
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 700;
-    text-transform: uppercase;
-    margin-bottom: 16px;
 }
 
-.card-rarity.common {
-    color: var(--common);
+.rev-rarity.common {
+    background: #3d3d3d;
+    color: white;
 }
 
-.card-rarity.rare {
-    color: var(--rare);
+.rev-rarity.rare {
+    background: #22c55e;
+    color: white;
 }
 
-.card-rarity.epic {
-    color: var(--epic);
+.rev-rarity.epic {
+    background: #a855f7;
+    color: white;
 }
 
-.card-rarity.legendary {
-    color: var(--legendary);
+.rev-rarity.legendary {
+    background: #f59e0b;
+    color: white;
 }
 
 .modal-close {
