@@ -744,6 +744,7 @@ function openChest(type) {
                     <span class="label">Рыночная цена:</span>
                     <div class="price-value">⭐ ${Math.round(price)}</div>
                 </div>
+                <button class="modal-close rev-btn" onclick="closeModal()">Забрать!</button>
             </div>
         `;
 
