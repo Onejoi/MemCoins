@@ -710,46 +710,55 @@ function openChest(type) {
     const modal = document.getElementById('chestModal');
     const animation = document.getElementById('chestAnimation');
     const reveal = document.getElementById('cardReveal');
+    const flash = document.getElementById('chestFlash');
 
     modal.classList.add('active');
     animation.style.display = 'block';
+    animation.classList.remove('opening');
     reveal.style.display = 'none';
+    flash.classList.remove('active');
 
     const meme = MEME_TYPES[Math.floor(Math.random() * MEME_TYPES.length)];
     const rarity = getRandomRarity();
     const card = mintCard(meme.id, rarity);
 
-    // Animate
+    // Cinematic Opening Sequence
     setTimeout(() => {
-        animation.style.display = 'none';
-        reveal.style.display = 'block';
+        // Step 1: Flash & Pop
+        flash.classList.add('active');
+        animation.classList.add('opening');
 
-        const iconHtml = meme.image
-            ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
-            : `🖼️`;
+        setTimeout(() => {
+            // Step 2: Show Card
+            animation.style.display = 'none';
+            reveal.style.display = 'block';
 
-        const price = state.prices[meme.id].current * RARITIES[rarity].multiplier;
+            const iconHtml = meme.image
+                ? `<img src="${meme.image}" class="revealed-icon" alt="${meme.name}">`
+                : `🖼️`;
 
-        document.getElementById('revealedCard').innerHTML = `
-            <div class="revealed-info ${rarity}">
-                <div class="rev-header">
-                    <div class="rev-series">#${card.serialNumber}</div>
-                    <div class="rev-rarity-pill ${rarity}">${rarity.toUpperCase()}</div>
+            const price = state.prices[meme.id].current * RARITIES[rarity].multiplier;
+
+            document.getElementById('revealedCard').innerHTML = `
+                <div class="revealed-info ${rarity}">
+                    <div class="rev-header">
+                        <div class="rev-series">#${card.serialNumber}</div>
+                        <div class="rev-rarity-pill ${rarity}">${rarity.toUpperCase()}</div>
+                    </div>
+                    <div class="rev-image-wrap">
+                        ${iconHtml}
+                    </div>
+                    <div class="rev-name">${meme.name}</div>
+                    <div class="rev-price">
+                        <span class="label">Рыночная цена:</span>
+                        <div class="price-value">⭐ ${Math.round(price)}</div>
+                    </div>
+                    <button class="modal-close rev-btn" onclick="closeModal()">Забрать!</button>
                 </div>
-                <div class="rev-image-wrap">
-                    ${iconHtml}
-                </div>
-                <div class="rev-name">${meme.name}</div>
-                <div class="rev-price">
-                    <span class="label">Рыночная цена:</span>
-                    <div class="price-value">⭐ ${Math.round(price)}</div>
-                </div>
-                <button class="modal-close rev-btn" onclick="closeModal()">Забрать!</button>
-            </div>
-        `;
-
-        renderCollection();
-    }, 1500);
+            `;
+            renderCollection();
+        }, 300); // 300ms after flash starts
+    }, 1200); // Shake for 1.2s
 }
 
 function closeModal() {
