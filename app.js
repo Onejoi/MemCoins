@@ -710,13 +710,11 @@ function openChest(type) {
     const modal = document.getElementById('chestModal');
     const animation = document.getElementById('chestAnimation');
     const reveal = document.getElementById('cardReveal');
-    const flash = document.getElementById('chestFlash');
 
     modal.classList.add('active');
     animation.style.display = 'block';
     animation.classList.remove('opening');
     reveal.style.display = 'none';
-    flash.classList.remove('active');
 
     const meme = MEME_TYPES[Math.floor(Math.random() * MEME_TYPES.length)];
     const rarity = getRandomRarity();
@@ -724,8 +722,7 @@ function openChest(type) {
 
     // Cinematic Opening Sequence
     setTimeout(() => {
-        // Step 1: Flash & Pop
-        flash.classList.add('active');
+        // Step 1: Hide Chest
         animation.classList.add('opening');
 
         setTimeout(() => {
@@ -757,7 +754,7 @@ function openChest(type) {
                 </div>
             `;
             renderCollection();
-        }, 300); // 300ms after flash starts
+        }, 300); // 300ms after fade/scale starts
     }, 1200); // Shake for 1.2s
 }
 
