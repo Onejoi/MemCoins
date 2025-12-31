@@ -1487,18 +1487,20 @@ body {
 
 .modal-close {
     width: 100%;
-    /* Fill the padded info box */
     margin-top: 15px;
     padding: 16px;
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 900;
+    /* Extra bold */
     background: #fcd535;
     border: none;
     border-radius: 16px;
     color: #0b0e11;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(252, 213, 53, 0.3);
+    box-shadow: 0 4px 15px rgba(252, 213, 53, 0.4);
     transition: all 0.1s;
+    text-transform: none;
+    /* Keep text as is */
 }
 
 .modal-close:active {
