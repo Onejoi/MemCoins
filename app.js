@@ -37,7 +37,8 @@ const state = {
     priceHistory: {},
     orderbook: {},
     trades: {},
-    supply: {} // Tracks total minted cards per ID: { 'fighter_common': 42 }
+    supply: {},
+    listings: [] // All active sell orders: { seller: 'bot', card: {}, price: 100 }
 };
 
 // ============================================
@@ -204,43 +205,70 @@ function updatePrices() {
 
 function initOrderbook() {
     MEME_TYPES.forEach(meme => {
-        state.orderbook[meme.id] = generateOrderbook(state.prices[meme.id].current);
+        state.orderbook[meme.id] = { asks: [], bids: [] };
+        const base = state.prices[meme.id].current;
+
+        // Generate mock "Bot" sellers with specific serial numbers
+        for (let i = 0; i < 15; i++) {
+            const rarity = Math.random() > 0.8 ? 'rare' : 'common';
+            const price = base * (1 + (i * 0.05)); // Spread them out
+            const serial = Math.floor(Math.random() * 1000) + 1;
+
+            state.orderbook[meme.id].asks.push({
+                id: `order_${Math.random().toString(36).substr(2, 5)}`,
+                type: 'ask',
+                memeId: meme.id,
+                price: Math.round(price),
+                card: {
+                    serialNumber: serial,
+                    rarity: rarity,
+                    memeType: meme.id
+                },
+                seller: 'Market Bot'
+            });
+        }
+
+        // Generate mock "Bot" buyers
+        for (let i = 0; i < 10; i++) {
+            state.orderbook[meme.id].bids.push({
+                price: Math.round(base * (0.95 - (i * 0.05))),
+                amount: Math.floor(Math.random() * 5) + 1
+            });
+        }
+
+        // Sort
+        state.orderbook[meme.id].asks.sort((a, b) => a.price - b.price);
+        state.orderbook[meme.id].bids.sort((a, b) => b.price - a.price);
     });
 }
 
-function generateOrderbook(midPrice) {
-    const asks = [];
-    const bids = [];
+function renderOrderbook() {
+    const book = state.orderbook[state.currentPair];
+    if (!book) return;
 
-    // Generate asks (sell orders)
-    for (let i = 0; i < 8; i++) {
-        const price = midPrice * (1.005 + i * 0.008 + Math.random() * 0.005);
-        asks.push({
-            price: Math.round(price * 100) / 100,
-            amount: Math.floor(1 + Math.random() * 15),
-            total: 0
-        });
-    }
+    // Render asks (Sell Orders)
+    const asksHtml = [...book.asks].reverse().map(order => `
+        <div class="orderbook-row sell" onclick="buySpecificOrder('${order.id}')" title="Нажмите, чтобы купить именно этот номер">
+            <span class="price">${formatPrice(order.price)}</span>
+            <span class="serial">#${order.card.serialNumber}</span>
+            <span class="rarity ${order.card.rarity}">${order.card.rarity.toUpperCase()}</span>
+            <div class="depth-bar ask" style="width: ${Math.random() * 50 + 20}%"></div>
+        </div>
+    `).join('');
 
-    // Generate bids (buy orders)
-    for (let i = 0; i < 8; i++) {
-        const price = midPrice * (0.995 - i * 0.008 - Math.random() * 0.005);
-        bids.push({
-            price: Math.round(price * 100) / 100,
-            amount: Math.floor(1 + Math.random() * 15),
-            total: 0
-        });
-    }
+    // Render bids (Buy Orders)
+    const bidsHtml = book.bids.map(order => `
+        <div class="orderbook-row buy">
+            <span class="price">${formatPrice(order.price)}</span>
+            <span class="amount">${order.amount} шт.</span>
+            <span class="label">Ордер</span>
+            <div class="depth-bar bid" style="width: ${Math.random() * 50 + 20}%"></div>
+        </div>
+    `).join('');
 
-    // Sort
-    asks.sort((a, b) => a.price - b.price);
-    bids.sort((a, b) => b.price - a.price);
-
-    // Calculate totals
-    asks.reduce((sum, order) => { order.total = sum + order.amount; return order.total; }, 0);
-    bids.reduce((sum, order) => { order.total = sum + order.amount; return order.total; }, 0);
-
-    return { asks, bids };
+    document.getElementById('orderbookAsks').innerHTML = asksHtml;
+    document.getElementById('orderbookBids').innerHTML = bidsHtml;
+    document.getElementById('spreadPrice').textContent = formatPrice(state.prices[state.currentPair].current);
 }
 
 function renderOrderbook() {
@@ -648,45 +676,108 @@ function updateOrderForm() {
 
 function submitOrder() {
     const amount = parseInt(document.getElementById('orderAmount').value) || 1;
-    const price = state.prices[state.currentPair].current;
-    const total = price * amount;
+    const type = state.currentPair;
+    const book = state.orderbook[type];
 
     if (state.orderSide === 'buy') {
-        if (total > state.balance) {
-            alert('Недостаточно средств!');
+        const cheapestAsks = book.asks.slice(0, amount);
+        if (cheapestAsks.length < amount) {
+            alert('Недостаточно предложений на рынке!');
             return;
         }
 
-        state.balance -= total;
+        let totalPaid = 0;
+        cheapestAsks.forEach(order => {
+            totalPaid += order.price;
+            executeTrade(order);
+        });
 
-        // Add cards to collection
-        for (let i = 0; i < amount; i++) {
-            mintCard(state.currentPair);
-        }
-
-        alert(`✅ Куплено ${amount} карточек за ${formatPrice(total)}`);
+        alert(`✅ Куплено ${amount} карточек за ${formatPrice(totalPaid)}`);
     } else {
-        // Sell logic - remove cards
-        const cardsToSell = state.collection
-            .filter(c => c.memeType === state.currentPair)
-            .slice(0, amount);
+        // Simple sell logic: sell to the best bid
+        const totalValue = state.prices[type].current * amount;
+        state.balance += totalValue;
 
-        if (cardsToSell.length < amount) {
-            alert('Недостаточно карточек для продажи!');
-            return;
-        }
-
-        cardsToSell.forEach(card => {
+        // Remove from collection
+        const cardsToRemove = state.collection.filter(c => c.memeType === type).slice(0, amount);
+        cardsToRemove.forEach(card => {
             const idx = state.collection.findIndex(c => c.id === card.id);
             if (idx !== -1) state.collection.splice(idx, 1);
         });
 
-        state.balance += total * 0.98; // 2% fee
-        alert(`✅ Продано ${amount} карточек за ${formatPrice(total * 0.98)}`);
+        updateChartOnTrade(state.prices[type].current * 0.98); // Small drop on sell
+        alert(`✅ Продано ${amount} карточек за ${formatPrice(totalValue)}`);
     }
 
     updateBalance();
     renderCollection();
+    renderOrderbook();
+}
+
+function buySpecificOrder(orderId) {
+    const type = state.currentPair;
+    const book = state.orderbook[type];
+    const orderIdx = book.asks.findIndex(o => o.id === orderId);
+
+    if (orderIdx === -1) return;
+    const order = book.asks[orderIdx];
+
+    if (state.balance < order.price) {
+        alert('Недостаточно средств!');
+        return;
+    }
+
+    if (confirm(`Купить ${state.currentPair.toUpperCase()} #${order.card.serialNumber} за ${formatPrice(order.price)}?`)) {
+        executeTrade(order);
+        updateBalance();
+        renderCollection();
+        renderOrderbook();
+        alert('🎯 Покупка совершена!');
+    }
+}
+
+function executeTrade(order) {
+    // Money
+    state.balance -= order.price;
+
+    // Transfer Card
+    const newCard = {
+        id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        memeType: order.memeId,
+        rarity: order.card.rarity,
+        serialNumber: order.card.serialNumber,
+        acquiredAt: new Date()
+    };
+    state.collection.push(newCard);
+
+    // Remove from book
+    const book = state.orderbook[order.memeId];
+    const idx = book.asks.findIndex(o => o.id === order.id);
+    if (idx !== -1) book.asks.splice(idx, 1);
+
+    // Update Chart & Market Price
+    updateChartOnTrade(order.price);
+}
+
+function updateChartOnTrade(tradePrice) {
+    const type = state.currentPair;
+    state.prices[type].current = tradePrice;
+
+    if (window.candleSeries) {
+        const history = state.priceHistory[type];
+        const lastCandle = history[history.length - 1];
+
+        const newCandle = {
+            time: Math.floor(Date.now() / 1000),
+            open: lastCandle.close,
+            high: Math.max(lastCandle.close, tradePrice),
+            low: Math.min(lastCandle.close, tradePrice),
+            close: tradePrice
+        };
+
+        history.push(newCandle);
+        window.candleSeries.update(newCandle);
+    }
 }
 
 function getRandomRarity() {
