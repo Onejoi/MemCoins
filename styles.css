@@ -645,38 +645,67 @@ body {
 .orderbook-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    padding: 4px 12px;
+    padding: 6px 12px;
     font-size: 11px;
     position: relative;
     cursor: pointer;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.orderbook-row:hover {
-    background: var(--bg-hover);
+.orderbook-row.sell {
+    background: rgba(239, 68, 68, 0.03);
 }
 
-.orderbook-row .depth {
+.orderbook-row.sell:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.orderbook-row.buy {
+    background: rgba(34, 197, 94, 0.03);
+}
+
+.orderbook-row .serial {
+    font-weight: 700;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 10px;
+    width: fit-content;
+}
+
+.orderbook-row .rarity {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.orderbook-row .depth-bar {
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
     opacity: 0.15;
+    z-index: 0;
+}
+
+.orderbook-row .depth-bar.ask {
+    background: var(--red);
+}
+
+.orderbook-row .depth-bar.bid {
+    background: var(--green);
 }
 
 .orderbook-asks .orderbook-row .price {
     color: var(--red);
-}
-
-.orderbook-asks .orderbook-row .depth {
-    background: var(--red);
+    font-weight: 600;
 }
 
 .orderbook-bids .orderbook-row .price {
     color: var(--green);
-}
-
-.orderbook-bids .orderbook-row .depth {
-    background: var(--green);
+    font-weight: 600;
 }
 
 .orderbook-spread {
