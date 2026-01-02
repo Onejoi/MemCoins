@@ -8,10 +8,10 @@
 // ============================================
 
 const MEME_TYPES = [
-    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', basePrice: 800, color: '#ef4444' },
-    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', basePrice: 420, color: '#22c55e' },
-    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', basePrice: 1000, color: '#f59e0b' },
-    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', basePrice: 200, color: '#3b82f6' },
+    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', basePrice: 1500, color: '#ef4444' },
+    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', basePrice: 800, color: '#22c55e' },
+    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', basePrice: 2500, color: '#f59e0b' },
+    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', basePrice: 500, color: '#3b82f6' },
     { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', basePrice: 2500, color: '#a855f7' },
     { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', basePrice: 350, color: '#ef4444' },
     { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', basePrice: 150, color: '#f59e0b' },
@@ -31,7 +31,8 @@ const state = {
     currentPair: 'fighter',
     orderSide: 'buy',
     orderType: 'market',
-    balance: 1250.00,
+    stars: 1250, // Hard currency from TG Stars
+    mp: 50000,   // Soft currency for trading
     collection: [],
     prices: {},
     priceHistory: {},
@@ -696,7 +697,7 @@ function submitOrder() {
     } else {
         // Simple sell logic: sell to the best bid
         const totalValue = state.prices[type].current * amount;
-        state.balance += totalValue;
+        state.mp += totalValue;
 
         // Remove from collection
         const cardsToRemove = state.collection.filter(c => c.memeType === type).slice(0, amount);
@@ -722,7 +723,7 @@ function buySpecificOrder(orderId) {
     if (orderIdx === -1) return;
     const order = book.asks[orderIdx];
 
-    if (state.balance < order.price) {
+    if (state.mp < order.price) {
         alert('Недостаточно средств!');
         return;
     }
@@ -738,7 +739,7 @@ function buySpecificOrder(orderId) {
 
 function executeTrade(order) {
     // Money
-    state.balance -= order.price;
+    state.mp -= order.price;
 
     // Transfer Card
     const newCard = {
@@ -934,7 +935,16 @@ function formatTime(date) {
 }
 
 function updateBalance() {
-    document.getElementById('userBalance').textContent = formatPrice(state.balance);
-    document.getElementById('profileBalance').textContent = formatPrice(state.balance);
+    document.getElementById('userBalance').textContent = state.stars.toLocaleString();
+    if (document.getElementById('userMP')) {
+        document.getElementById('userMP').textContent = state.mp.toLocaleString();
+    }
+    document.getElementById('profileBalance').textContent = state.stars.toLocaleString();
     document.getElementById('profileCards').textContent = state.collection.length;
+}
+
+function formatPrice(val) {
+    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M 🪙';
+    if (val >= 1000) return (val / 1000).toFixed(1) + 'k 🪙';
+    return Math.round(val) + ' 🪙';
 }
