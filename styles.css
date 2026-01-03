@@ -106,22 +106,43 @@ body {
     gap: 12px;
 }
 
-.balance {
+.balances {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    gap: 12px;
+    margin-right: 12px;
+    align-items: center;
 }
 
-.balance-label {
-    font-size: 10px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
+.balance-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.balance-value {
+.balance-item .symbol,
+.coin-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.balance-item .value {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--green);
+    font-weight: 700;
+}
+
+.balance-item.stars .value {
+    color: #fcd535;
+    /* Gold for Stars */
+}
+
+.balance-item.mp .value {
+    color: #a855f7;
+    /* Purple for MP */
 }
 
 .profile-btn {
