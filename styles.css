@@ -125,9 +125,12 @@ body {
 
 .balance-item .symbol,
 .coin-icon {
-    width: 18px;
-    height: 18px;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
     object-fit: contain;
+    vertical-align: middle;
+    margin: 0 2px;
 }
 
 .balance-item .value {
