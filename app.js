@@ -269,42 +269,7 @@ function renderOrderbook() {
 
     document.getElementById('orderbookAsks').innerHTML = asksHtml;
     document.getElementById('orderbookBids').innerHTML = bidsHtml;
-    document.getElementById('spreadPrice').textContent = formatPrice(state.prices[state.currentPair].current);
-}
-
-function renderOrderbook() {
-    const book = state.orderbook[state.currentPair];
-    if (!book) return;
-
-    const price = state.prices[state.currentPair].current;
-    const maxTotal = Math.max(
-        ...book.asks.map(o => o.total),
-        ...book.bids.map(o => o.total)
-    );
-
-    // Render asks (reversed to show highest at top)
-    const asksHtml = [...book.asks].reverse().map(order => `
-        <div class="orderbook-row">
-            <span class="price">${formatPrice(order.price)}</span>
-            <span>${order.amount}</span>
-            <span>${formatPrice(order.price * order.amount)}</span>
-            <div class="depth" style="width: ${(order.total / maxTotal) * 100}%"></div>
-        </div>
-    `).join('');
-
-    // Render bids
-    const bidsHtml = book.bids.map(order => `
-        <div class="orderbook-row">
-            <span class="price">${formatPrice(order.price)}</span>
-            <span>${order.amount}</span>
-            <span>${formatPrice(order.price * order.amount)}</span>
-            <div class="depth" style="width: ${(order.total / maxTotal) * 100}%"></div>
-        </div>
-    `).join('');
-
-    document.getElementById('orderbookAsks').innerHTML = asksHtml;
-    document.getElementById('orderbookBids').innerHTML = bidsHtml;
-    document.getElementById('spreadPrice').textContent = formatPrice(price);
+    document.getElementById('spreadPrice').innerHTML = formatPrice(state.prices[state.currentPair].current);
 }
 
 // ============================================
@@ -417,15 +382,15 @@ function updateCurrentPairInfo() {
 
     document.getElementById('currentEmoji').innerHTML = iconHtml;
     document.getElementById('currentPairName').textContent = meme.id.toUpperCase();
-    document.getElementById('currentPrice').textContent = formatPrice(priceData.current);
+    document.getElementById('currentPrice').innerHTML = formatPrice(priceData.current);
 
     const changeEl = document.getElementById('currentChange');
     changeEl.textContent = `${changeSign}${priceData.change24h.toFixed(1)}%`;
     changeEl.className = `pair-change ${changeClass}`;
 
-    document.getElementById('high24h').textContent = formatPrice(priceData.high24h);
-    document.getElementById('low24h').textContent = formatPrice(priceData.low24h);
-    document.getElementById('volume24h').textContent = '$' + priceData.volume24h.toLocaleString();
+    document.getElementById('high24h').innerHTML = formatPrice(priceData.high24h);
+    document.getElementById('low24h').innerHTML = formatPrice(priceData.low24h);
+    document.getElementById('volume24h').textContent = priceData.volume24h.toLocaleString();
 }
 
 // ============================================
@@ -666,7 +631,7 @@ function updateOrderForm() {
     const amount = parseInt(document.getElementById('orderAmount').value) || 1;
     const total = price * amount;
 
-    document.getElementById('orderTotal').textContent = formatPrice(total);
+    document.getElementById('orderTotal').innerHTML = formatPrice(total);
 
     const submitBtn = document.getElementById('submitOrder');
     submitBtn.textContent = state.orderSide === 'buy'
@@ -925,10 +890,6 @@ function showPage(pageId) {
 // ============================================
 // Utility Functions
 // ============================================
-
-function formatPrice(price) {
-    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
 
 function formatTime(date) {
     return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
