@@ -840,7 +840,7 @@ function openChest(type) {
                     <div class="rev-name">${meme.name}</div>
                     <div class="rev-price">
                         <span class="label">Рыночная цена:</span>
-                        <div class="price-value">⭐ ${Math.round(price)}</div>
+                        <div class="price-value">${formatPrice(price)}</div>
                     </div>
                     <button class="modal-close rev-btn" onclick="closeModal()">Забрать!</button>
                 </div>
@@ -944,7 +944,8 @@ function updateBalance() {
 }
 
 function formatPrice(val) {
-    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M 🪙';
-    if (val >= 1000) return (val / 1000).toFixed(1) + 'k 🪙';
-    return Math.round(val) + ' 🪙';
+    const icon = '<img src="images/mp_coin.png" class="coin-icon price-icon">';
+    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M ' + icon;
+    if (val >= 1000) return (val / 1000).toFixed(1) + 'k ' + icon;
+    return Math.round(val) + ' ' + icon;
 }
