@@ -494,7 +494,7 @@ function initChart() {
         },
         rightPriceScale: {
             borderColor: '#2b3139',
-            autoScale: false, // KEY: Set to false for immediate vertical panning
+            autoScale: true, // Start with auto-fit
             visible: true,
             alignLabels: true,
             borderVisible: true,
@@ -507,27 +507,28 @@ function initChart() {
             borderColor: '#2b3139',
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 20,
+            rightOffset: 12,
             barSpacing: 10,
             fixLeftEdge: false,
             fixRightEdge: false,
-            minBarSpacing: 0.5,
             lockVisibleTimeRangeOnResize: false,
-            rightBarStaysOnScroll: false,
+            rightBarStaysOnScroll: false, // Allows free horizontal movement
+            borderVisible: true,
             shiftVisibleRangeOnNewBar: false,
         },
         handleScroll: {
             mouseWheel: true,
             pressedMouseMove: true,
             horzTouchDrag: true,
-            vertTouchDrag: true, // KEY: Vertical Pan
+            vertTouchDrag: true,
+            kineticScroll: { touch: true, mouse: true }
         },
         handleScale: {
             mouseWheel: true,
             pinch: true,
             axisPressedMouseMove: {
-                price: true, // KEY: Stretching Axis
-                time: true
+                price: true,
+                time: false // Dragging time axis labels will now PAN, not ZOOM
             }
         },
         kineticScroll: {
@@ -536,9 +537,39 @@ function initChart() {
         }
     });
 
+    // --- AUTO-UNLOCK VERTICAL PAN ---
+    // In Binance, dragging the chart vertically unlocks the scale instantly.
+    let isDragging = false;
+    let startY = 0;
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true; startY = e.clientY;
+    });
+    container.addEventListener('touchstart', (e) => {
+        isDragging = true; startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    const unlockHandler = (currentY) => {
+        if (isDragging && Math.abs(currentY - startY) > 5) {
+            chart.priceScale('right').applyOptions({ autoScale: false });
+        }
+    };
+
+    container.addEventListener('mousemove', (e) => unlockHandler(e.clientY));
+    container.addEventListener('touchmove', (e) => unlockHandler(e.touches[0].clientY), { passive: true });
+
+    const stopDragging = () => { isDragging = false; };
+    window.addEventListener('mouseup', stopDragging);
+    window.addEventListener('touchend', stopDragging);
+
+    // --- RESET SCALE ON DOUBLE CLICK ---
+    container.addEventListener('dblclick', () => {
+        chart.priceScale('right').applyOptions({ autoScale: true });
+        chart.timeScale().fitContent();
+    });
+
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#10b981', // More vibrant green
-        downColor: '#ef4444', // More vibrant red
+        upColor: '#10b981',
+        downColor: '#ef4444',
         borderUpColor: '#10b981',
         borderDownColor: '#ef4444',
         wickUpColor: '#10b981',
