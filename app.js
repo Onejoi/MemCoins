@@ -244,31 +244,6 @@ function initOrderbook() {
     });
 }
 
-/**
- * ГЕНЕРАЦИЯ СТАКАНА ДЛЯ МАРКЕТ-МЕЙКЕРОВ
- */
-function generateOrderbook(basePrice) {
-    const book = { asks: [], bids: [] };
-    for (let i = 0; i < 10; i++) {
-        book.asks.push({
-            id: `bot_ask_${Date.now()}_${i}`,
-            price: Math.round(basePrice * (1 + 0.01 * (i + 1))),
-            amount: Math.floor(Math.random() * 10) + 1,
-            card: {
-                serialNumber: Math.floor(Math.random() * 1000) + 1,
-                rarity: getRandomRarity(),
-                memeType: state.currentPair
-            }
-        });
-        book.bids.push({
-            id: `bot_bid_${Date.now()}_${i}`,
-            price: Math.round(basePrice * (1 - 0.01 * (i + 1))),
-            amount: Math.floor(Math.random() * 10) + 1
-        });
-    }
-    return book;
-}
-
 function renderOrderbook() {
     const book = state.orderbook[state.currentPair];
     if (!book) return;
@@ -492,33 +467,34 @@ function initChart() {
         width: containerWidth,
         height: containerHeight,
         layout: {
-            background: { type: 'solid', color: '#161a1e' }, // Binance Dark
-            textColor: '#848e9c',
+            background: { type: 'solid', color: '#161a1e' },
+            textColor: '#d1d4dc',
             fontSize: 12,
             fontFamily: "'Inter', sans-serif"
         },
         grid: {
-            vertLines: { color: 'rgba(43, 49, 57, 0.5)' },
-            horzLines: { color: 'rgba(43, 49, 57, 0.5)' }
+            vertLines: { color: 'rgba(43, 49, 57, 0.4)' },
+            horzLines: { color: 'rgba(43, 49, 57, 0.4)' }
         },
         crosshair: {
             mode: LightweightCharts.CrosshairMode.Normal,
             vertLine: {
                 width: 1,
-                color: '#848e9c',
-                style: 2, // Dashed
-                labelBackgroundColor: '#414854',
+                color: '#758696',
+                style: 3,
+                labelBackgroundColor: '#161a1e',
             },
             horzLine: {
                 width: 1,
-                color: '#848e9c',
-                style: 2, // Dashed
-                labelBackgroundColor: '#414854',
+                color: '#758696',
+                style: 3,
+                labelBackgroundColor: '#161a1e',
             },
         },
         rightPriceScale: {
             borderColor: '#2b3139',
             autoScale: true,
+            visible: true,
             alignLabels: true,
             borderVisible: true,
             scaleMargins: {
@@ -532,46 +508,40 @@ function initChart() {
             secondsVisible: false,
             rightOffset: 20,
             barSpacing: 10,
-            minBarSpacing: 0.5,
             fixLeftEdge: false,
             fixRightEdge: false,
+            minBarSpacing: 0.5,
             lockVisibleTimeRangeOnResize: false,
-            rightBarStaysOnScroll: false, // Binance: Pan moves bars
-            borderVisible: true,
+            rightBarStaysOnScroll: false,
             shiftVisibleRangeOnNewBar: false,
         },
         handleScroll: {
             mouseWheel: true,
             pressedMouseMove: true,
             horzTouchDrag: true,
-            vertTouchDrag: true,
-            kineticScroll: {
-                touch: true,
-                mouse: true,
-            },
+            vertTouchDrag: true, // KEY: Vertical Pan
         },
         handleScale: {
-            axisPressedMouseMove: {
-                price: true,
-                time: true,
-            },
             mouseWheel: true,
             pinch: true,
+            axisPressedMouseMove: {
+                price: true, // KEY: Stretching Axis
+                time: true
+            }
         },
+        kineticScroll: {
+            touch: true,
+            mouse: true
+        }
     });
 
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#0ecb81',
-        downColor: '#f6465d',
-        borderUpColor: '#0ecb81',
-        borderDownColor: '#f6465d',
-        wickUpColor: '#0ecb81',
-        wickDownColor: '#f6465d',
-        priceFormat: {
-            type: 'price',
-            precision: 2,
-            minMove: 0.01,
-        },
+        upColor: '#10b981', // More vibrant green
+        downColor: '#ef4444', // More vibrant red
+        borderUpColor: '#10b981',
+        borderDownColor: '#ef4444',
+        wickUpColor: '#10b981',
+        wickDownColor: '#ef4444'
     });
 
     updateChart();
@@ -728,8 +698,7 @@ function setupEventListeners() {
     document.querySelectorAll('.quick-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const percent = parseInt(btn.dataset.percent);
-            const currentPrice = state.prices[state.currentPair].current;
-            const maxCards = Math.floor(state.mp / currentPrice);
+            const maxCards = Math.floor(state.balance / state.prices[state.currentPair].current);
             const amount = Math.floor(maxCards * percent / 100);
             document.getElementById('orderAmount').value = Math.max(1, amount);
             updateOrderForm();
@@ -1029,7 +998,7 @@ document.getElementById('startBattle')?.addEventListener('click', () => {
 
     if (won) {
         const prize = state.prices[card.memeType].current * rarity.multiplier * 0.3;
-        state.mp += prize;
+        state.balance += prize;
         alert(`🎉 ПОБЕДА! Вы выиграли ${formatPrice(prize)}`);
     } else {
         // Remove card
