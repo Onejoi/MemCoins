@@ -459,9 +459,10 @@ let candleSeries = null;
 
 function initChart() {
     const container = document.getElementById('chartContainer');
+
     // Get actual container dimensions
-    const containerWidth = container.clientWidth || window.innerWidth;
-    const containerHeight = container.clientHeight || 400; // Better default for manual mode
+    const containerWidth = container.clientWidth || window.innerWidth - 20;
+    const containerHeight = Math.min(container.clientHeight || 250, 300);
 
     chart = LightweightCharts.createChart(container, {
         width: containerWidth,
@@ -493,11 +494,14 @@ function initChart() {
         },
         rightPriceScale: {
             borderColor: '#2b3139',
-            autoScale: false,
+            autoScale: false, // Manual from start for freedom
             visible: true,
             alignLabels: true,
             borderVisible: true,
-            scaleMargins: { top: 0.1, bottom: 0.2 },
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.2,
+            },
         },
         timeScale: {
             borderColor: '#2b3139',
@@ -523,7 +527,7 @@ function initChart() {
             pinch: true,
             axisPressedMouseMove: {
                 price: true,
-                time: true
+                time: false // Disable default zoom to implement custom PAN
             }
         },
         kineticScroll: {
@@ -531,6 +535,59 @@ function initChart() {
             mouse: true
         }
     });
+
+    // --- CUSTOM TIME AXIS PANNING ---
+    let isAxisDragging = false;
+    let startAxisX = 0;
+    let startScrollPos = 0;
+
+    container.addEventListener('mousedown', (e) => {
+        const rect = container.getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        // If clicked in bottom 30px (Time Axis zone)
+        if (y > rect.height - 30) {
+            isAxisDragging = true;
+            startAxisX = e.clientX;
+            // Get current scroll position (approximation)
+            const range = chart.timeScale().getVisibleRange();
+            if (range) startScrollPos = chart.timeScale().scrollPosition();
+            e.stopPropagation();
+        }
+    }, true);
+
+    window.addEventListener('mousemove', (e) => {
+        if (isAxisDragging) {
+            const dx = e.clientX - startAxisX;
+            // Convert pixels to bars (approx spacing is barSpacing)
+            const barSpacing = chart.timeScale().options().barSpacing;
+            const scrollDelta = dx / barSpacing;
+            chart.timeScale().scrollToPosition(startScrollPos + scrollDelta, false);
+        }
+    });
+
+    window.addEventListener('mouseup', () => { isAxisDragging = false; });
+
+    // Touch support for axis pan
+    container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            const rect = container.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            if (y > rect.height - 30) {
+                isAxisDragging = true;
+                startAxisX = e.touches[0].clientX;
+                startScrollPos = chart.timeScale().scrollPosition();
+            }
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        if (isAxisDragging && e.touches.length === 1) {
+            const dx = e.touches[0].clientX - startAxisX;
+            const barSpacing = chart.timeScale().options().barSpacing;
+            const scrollDelta = dx / barSpacing;
+            chart.timeScale().scrollToPosition(startScrollPos + scrollDelta, false);
+        }
+    }, { passive: true });
 
     // --- RESET SCALE ON DOUBLE CLICK ---
     container.addEventListener('dblclick', () => {
@@ -552,12 +609,13 @@ function initChart() {
 
     updateChart();
 
+    // Resize handling
     if (typeof ResizeObserver !== 'undefined') {
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 const { width, height } = entry.contentRect;
                 if (width > 0 && height > 0) {
-                    chart.applyOptions({ width, height });
+                    chart.applyOptions({ width, height: Math.min(height, 300) });
                 }
             }
         });
