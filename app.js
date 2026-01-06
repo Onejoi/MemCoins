@@ -459,8 +459,9 @@ let candleSeries = null;
 
 function initChart() {
     const container = document.getElementById('chartContainer');
-    const containerWidth = container.clientWidth || window.innerWidth - 20;
-    const containerHeight = Math.min(container.clientHeight || 250, 300);
+    // Get actual container dimensions
+    const containerWidth = container.clientWidth || window.innerWidth;
+    const containerHeight = container.clientHeight || 400; // Better default for manual mode
 
     chart = LightweightCharts.createChart(container, {
         width: containerWidth,
@@ -556,7 +557,7 @@ function initChart() {
             for (let entry of entries) {
                 const { width, height } = entry.contentRect;
                 if (width > 0 && height > 0) {
-                    chart.applyOptions({ width, height: Math.min(height, 300) });
+                    chart.applyOptions({ width, height });
                 }
             }
         });
