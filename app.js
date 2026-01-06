@@ -505,18 +505,18 @@ function initChart() {
             borderColor: '#2b3139',
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 15, // Binance-like offset
+            rightOffset: 15, // Space at the right for new candles
             barSpacing: 10,
             fixLeftEdge: false,
-            fixRightEdge: false, // CRITICAL: Allow panning into the future
+            fixRightEdge: false, // Allows dragging BEYOND the current price
             lockVisibleTimeRangeOnResize: true,
-            rightBarStaysOnScroll: false, // CRITICAL: Pan moves everything, doesn't zoom
+            rightBarStaysOnScroll: false, // KEY: Pan moves all bars together
             borderVisible: true,
-            shiftVisibleRangeOnNewBar: false, // Don't jump when new data comes
+            shiftVisibleRangeOnNewBar: false, // Don't jump when news come
         },
         handleScroll: {
-            mouseWheel: false, // Binance uses wheel for ZOOM, not scroll
-            pressedMouseMove: true, // PANNING by dragging the chart
+            mouseWheel: true,
+            pressedMouseMove: true, // Panning in the main area
             horzTouchDrag: true,
             vertTouchDrag: true,
             kineticScroll: {
@@ -525,22 +525,23 @@ function initChart() {
             }
         },
         handleScale: {
+            // Dragging axes will zoom
             axisPressedMouseMove: {
                 price: true,
                 time: true
             },
-            mouseWheel: true, // ZOOMING with wheel
+            mouseWheel: true,
             pinch: true
         }
     });
 
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#0ecb81',
-        downColor: '#f6465d',
-        borderUpColor: '#0ecb81',
-        borderDownColor: '#f6465d',
-        wickUpColor: '#0ecb81',
-        wickDownColor: '#f6465d'
+        upColor: '#10b981', // More vibrant green
+        downColor: '#ef4444', // More vibrant red
+        borderUpColor: '#10b981',
+        borderDownColor: '#ef4444',
+        wickUpColor: '#10b981',
+        wickDownColor: '#ef4444'
     });
 
     updateChart();
