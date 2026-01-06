@@ -55,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderTradingPairs();
     renderOrderbook();
-    renderTrades();
+    updateChart();
+    checkLimitOrders();
     renderCollection();
 
     initChart();
@@ -278,6 +279,53 @@ function renderOrderbook() {
     document.getElementById('orderbookAsks').innerHTML = asksHtml;
     document.getElementById('orderbookBids').innerHTML = bidsHtml;
     document.getElementById('spreadPrice').innerHTML = formatPrice(state.prices[state.currentPair].current);
+}
+
+/**
+ * ПРОВЕРКА ЛИМИТНЫХ ОРДЕРОВ
+ * Только сделки на бирже двигают цену. Сундуки — нет.
+ */
+function checkLimitOrders() {
+    MEME_TYPES.forEach(meme => {
+        const currentPrice = state.prices[meme.id].current;
+        const book = state.orderbook[meme.id];
+
+        // 1. Покупка (Bids)
+        for (let i = book.bids.length - 1; i >= 0; i--) {
+            const order = book.bids[i];
+            if (order.isUser && currentPrice <= order.price) {
+                // Исполняем
+                for (let a = 0; a < order.amount; a++) {
+                    mintCard(meme.id);
+                }
+                state.mp -= (order.price * order.amount);
+
+                // ОБНОВЛЯЕМ ГРАФИК: Только сделка на бирже двигает цену!
+                updateChartOnTrade(order.price);
+
+                book.bids.splice(i, 1);
+                updateBalance();
+                renderCollection();
+            }
+        }
+
+        // 2. Продажа (Asks)
+        for (let i = book.asks.length - 1; i >= 0; i--) {
+            const order = book.asks[i];
+            if (order.isUser && currentPrice >= order.price) {
+                state.mp += order.price;
+
+                // ОБНОВЛЯЕМ ГРАФИК: Только сделка на бирже двигает цену!
+                updateChartOnTrade(order.price);
+
+                book.asks.splice(i, 1);
+                updateBalance();
+            }
+        }
+    });
+
+    // Запускаем проверку каждые 3 секунды
+    setTimeout(checkLimitOrders, 3000);
 }
 
 // ============================================
@@ -652,35 +700,88 @@ function submitOrder() {
     const amount = parseInt(document.getElementById('orderAmount').value) || 1;
     const type = state.currentPair;
     const book = state.orderbook[type];
+    const isLimit = state.orderType === 'limit';
+    const limitPrice = parseFloat(document.getElementById('limitPrice').value);
 
     if (state.orderSide === 'buy') {
-        const cheapestAsks = book.asks.slice(0, amount);
-        if (cheapestAsks.length < amount) {
-            alert('Недостаточно предложений на рынке!');
+        if (isLimit) {
+            // BUY LIMIT: Add to Bids
+            if (!limitPrice || limitPrice <= 0) { alert('Укажите цену для лимитного ордера'); return; }
+            if (state.mp < limitPrice * amount) { alert('Недостаточно MP для ордера!'); return; }
+
+            // In a real exchange, we lock funds. Here we just add to book.
+            const newOrder = {
+                id: `limit_buy_${Date.now()}`,
+                memeId: type,
+                price: limitPrice,
+                amount: amount,
+                isUser: true,
+                side: 'buy'
+            };
+            book.bids.push(newOrder);
+            book.bids.sort((a, b) => b.price - a.price);
+            alert(`✅ Лимитный ордер на покупку выставлен: ${amount} шт. по ${formatPrice(limitPrice)}`);
+        } else {
+            // MARKET BUY: Execute immediately against best asks
+            const cheapestAsks = book.asks.slice(0, amount);
+            if (cheapestAsks.length < amount) {
+                alert('Недостаточно предложений на рынке!');
+                return;
+            }
+
+            let totalPaid = 0;
+            cheapestAsks.forEach(order => {
+                totalPaid += order.price;
+                executeTrade(order);
+            });
+
+            alert(`✅ Куплено ${amount} карточек по рынку за ${formatPrice(totalPaid)}`);
+        }
+    } else {
+        // SELL Logic
+        const userCards = state.collection.filter(c => c.memeType === type);
+        if (userCards.length < amount) {
+            alert('У вас нет столько карточек для продажи!');
             return;
         }
 
-        let totalPaid = 0;
-        cheapestAsks.forEach(order => {
-            totalPaid += order.price;
-            executeTrade(order);
-        });
+        if (isLimit) {
+            // SELL LIMIT: Add to Asks
+            if (!limitPrice || limitPrice <= 0) { alert('Укажите цену для продажи'); return; }
 
-        alert(`✅ Куплено ${amount} карточек за ${formatPrice(totalPaid)}`);
-    } else {
-        // Simple sell logic: sell to the best bid
-        const totalValue = state.prices[type].current * amount;
-        state.mp += totalValue;
+            userCards.slice(0, amount).forEach(card => {
+                const newOrder = {
+                    id: `limit_sell_${Date.now()}_${card.id}`,
+                    memeId: type,
+                    price: limitPrice,
+                    amount: 1,
+                    card: card,
+                    isUser: true,
+                    side: 'sell'
+                };
+                book.asks.push(newOrder);
 
-        // Remove from collection
-        const cardsToRemove = state.collection.filter(c => c.memeType === type).slice(0, amount);
-        cardsToRemove.forEach(card => {
-            const idx = state.collection.findIndex(c => c.id === card.id);
-            if (idx !== -1) state.collection.splice(idx, 1);
-        });
+                // Remove from local collection (it's "listed")
+                const idx = state.collection.findIndex(c => c.id === card.id);
+                if (idx !== -1) state.collection.splice(idx, 1);
+            });
+            book.asks.sort((a, b) => a.price - b.price);
+            alert(`✅ Карточки (${amount} шт.) выставлены на продажу по цене ${formatPrice(limitPrice)}`);
+        } else {
+            // MARKET SELL: Sell to the best bid
+            const totalValue = state.prices[type].current * amount;
+            state.mp += totalValue;
 
-        updateChartOnTrade(state.prices[type].current * 0.98); // Small drop on sell
-        alert(`✅ Продано ${amount} карточек за ${formatPrice(totalValue)}`);
+            // Remove from collection
+            const cardsToRemove = userCards.slice(0, amount);
+            cardsToRemove.forEach(card => {
+                const idx = state.collection.findIndex(c => c.id === card.id);
+                if (idx !== -1) state.collection.splice(idx, 1);
+            });
+
+            updateChartOnTrade(state.prices[type].current * 0.98); // Small drop on sell
+            alert(`✅ Продано ${amount} карточек по рынку за ${formatPrice(totalValue)}`);
+        }
     }
 
     updateBalance();
