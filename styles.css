@@ -669,40 +669,104 @@ body {
 .orderbook-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    padding: 6px 12px;
-    font-size: 11px;
+    padding: 8px 12px;
+    font-size: 13px;
     position: relative;
     cursor: pointer;
     align-items: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
+    overflow: hidden;
+    z-index: 1;
 }
 
-.orderbook-row.sell {
-    background: rgba(239, 68, 68, 0.03);
+.orderbook-row:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.orderbook-row.sell:hover {
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.orderbook-row.buy {
-    background: rgba(34, 197, 94, 0.03);
+.orderbook-row .price {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .orderbook-row .serial {
-    font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
     background: rgba(255, 255, 255, 0.1);
-    padding: 1px 4px;
+    padding: 2px 6px;
     border-radius: 4px;
-    font-size: 10px;
+    text-align: center;
+    font-size: 11px;
     width: fit-content;
+    margin: 0 auto;
 }
 
-.orderbook-row .rarity {
-    font-size: 9px;
+.orderbook-row .rarity-badge {
+    text-align: right;
+    font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+/* Rarity Styles (Glow \u0026 Colors) */
+.orderbook-row.sell .price {
+    color: var(--red);
+}
+
+.orderbook-row.buy .price {
+    color: var(--green);
+}
+
+.orderbook-row.rare {
+    border-left: 3px solid #22c55e;
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.orderbook-row.rare .price {
+    color: #22c55e !important;
+}
+
+.orderbook-row.epic {
+    border-left: 3px solid #a855f7;
+    background: rgba(168, 85, 247, 0.08);
+    box-shadow: inset 50px 0 30px -30px rgba(168, 85, 247, 0.2);
+}
+
+.orderbook-row.epic .price {
+    color: #a855f7 !important;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.orderbook-row.legendary {
+    border-left: 3px solid #fcd535;
+    background: linear-gradient(90deg, rgba(252, 213, 53, 0.1) 0%, transparent 100%);
+    animation: row-pulse 2s infinite ease-in-out;
+}
+
+.orderbook-row.legendary .price {
+    color: #fcd535 !important;
+    text-shadow: 0 0 15px rgba(252, 213, 53, 0.7);
+}
+
+@keyframes row-pulse {
+    0% {
+        background-color: rgba(252, 213, 53, 0.05);
+    }
+
+    50% {
+        background-color: rgba(252, 213, 53, 0.15);
+    }
+
+    100% {
+        background-color: rgba(252, 213, 53, 0.05);
+    }
 }
 
 .orderbook-row .depth-bar {
@@ -711,25 +775,8 @@ body {
     top: 0;
     bottom: 0;
     opacity: 0.15;
-    z-index: 0;
-}
-
-.orderbook-row .depth-bar.ask {
-    background: var(--red);
-}
-
-.orderbook-row .depth-bar.bid {
-    background: var(--green);
-}
-
-.orderbook-asks .orderbook-row .price {
-    color: var(--red);
-    font-weight: 600;
-}
-
-.orderbook-bids .orderbook-row .price {
-    color: var(--green);
-    font-weight: 600;
+    z-index: -1;
+    transition: width 0.3s ease;
 }
 
 .orderbook-spread {
