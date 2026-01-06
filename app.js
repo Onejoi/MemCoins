@@ -505,18 +505,18 @@ function initChart() {
             borderColor: '#2b3139',
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 12,
+            rightOffset: 15, // Binance-like offset
             barSpacing: 10,
             fixLeftEdge: false,
-            fixRightEdge: false, // Allows dragging chart beyond current candle
+            fixRightEdge: false, // CRITICAL: Allow panning into the future
             lockVisibleTimeRangeOnResize: true,
-            rightBarStaysOnScroll: false, // Binance-style: pan moves EVERYTHING
+            rightBarStaysOnScroll: false, // CRITICAL: Pan moves everything, doesn't zoom
             borderVisible: true,
-            shiftVisibleRangeOnNewBar: false, // STOP JUMPING on update
+            shiftVisibleRangeOnNewBar: false, // Don't jump when new data comes
         },
         handleScroll: {
-            mouseWheel: true,
-            pressedMouseMove: true,
+            mouseWheel: false, // Binance uses wheel for ZOOM, not scroll
+            pressedMouseMove: true, // PANNING by dragging the chart
             horzTouchDrag: true,
             vertTouchDrag: true,
             kineticScroll: {
@@ -529,7 +529,7 @@ function initChart() {
                 price: true,
                 time: true
             },
-            mouseWheel: true,
+            mouseWheel: true, // ZOOMING with wheel
             pinch: true
         }
     });
