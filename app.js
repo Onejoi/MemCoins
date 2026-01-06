@@ -418,11 +418,12 @@ function renderTradingPairs() {
 
 function selectPair(pairId) {
     state.currentPair = pairId;
+    state.chartInitialized = false; // Reset to force fit on new pair
     renderTradingPairs();
     updateCurrentPairInfo();
     renderOrderbook();
     renderTrades();
-    updateChart();
+    updateChart(true);
     updateOrderForm();
 }
 
@@ -493,7 +494,7 @@ function initChart() {
         },
         rightPriceScale: {
             borderColor: '#2b3139',
-            autoScale: true,
+            autoScale: false, // KEY: Set to false for immediate vertical panning
             visible: true,
             alignLabels: true,
             borderVisible: true,
@@ -574,10 +575,21 @@ function initChart() {
     window.candleSeries = candleSeries;
 }
 
-function updateChart() {
+function updateChart(forceFit = false) {
     const history = state.priceHistory[state.currentPair];
     if (history && candleSeries) {
         candleSeries.setData(history);
+
+        // Auto-fit only once or when forced (like switching pairs)
+        if (forceFit || !state.chartInitialized) {
+            chart.timeScale().fitContent();
+            // Temporarily enable autoScale to find the right range, then lock it
+            chart.priceScale('right').applyOptions({ autoScale: true });
+            setTimeout(() => {
+                chart.priceScale('right').applyOptions({ autoScale: false });
+                state.chartInitialized = true;
+            }, 50);
+        }
     }
 }
 
