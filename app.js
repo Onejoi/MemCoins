@@ -494,7 +494,7 @@ function initChart() {
         },
         rightPriceScale: {
             borderColor: '#2b3139',
-            autoScale: true, // Start with auto-fit
+            autoScale: false, // Manual from start for freedom
             visible: true,
             alignLabels: true,
             borderVisible: true,
@@ -507,12 +507,12 @@ function initChart() {
             borderColor: '#2b3139',
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 12,
+            rightOffset: 20,
             barSpacing: 10,
             fixLeftEdge: false,
             fixRightEdge: false,
             lockVisibleTimeRangeOnResize: false,
-            rightBarStaysOnScroll: false, // Allows free horizontal movement
+            rightBarStaysOnScroll: false,
             borderVisible: true,
             shiftVisibleRangeOnNewBar: false,
         },
@@ -521,14 +521,13 @@ function initChart() {
             pressedMouseMove: true,
             horzTouchDrag: true,
             vertTouchDrag: true,
-            kineticScroll: { touch: true, mouse: true }
         },
         handleScale: {
             mouseWheel: true,
             pinch: true,
             axisPressedMouseMove: {
                 price: true,
-                time: false // Dragging time axis labels will now PAN, not ZOOM
+                time: true
             }
         },
         kineticScroll: {
@@ -537,70 +536,37 @@ function initChart() {
         }
     });
 
-    // --- AUTO-UNLOCK VERTICAL PAN ---
-    // In Binance, dragging the chart vertically unlocks the scale instantly.
-    let isDragging = false;
-    let startY = 0;
-    container.addEventListener('mousedown', (e) => {
-        isDragging = true; startY = e.clientY;
-    });
-    container.addEventListener('touchstart', (e) => {
-        isDragging = true; startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    const unlockHandler = (currentY) => {
-        if (isDragging && Math.abs(currentY - startY) > 5) {
-            chart.priceScale('right').applyOptions({ autoScale: false });
-        }
-    };
-
-    container.addEventListener('mousemove', (e) => unlockHandler(e.clientY));
-    container.addEventListener('touchmove', (e) => unlockHandler(e.touches[0].clientY), { passive: true });
-
-    const stopDragging = () => { isDragging = false; };
-    window.addEventListener('mouseup', stopDragging);
-    window.addEventListener('touchend', stopDragging);
-
     // --- RESET SCALE ON DOUBLE CLICK ---
     container.addEventListener('dblclick', () => {
         chart.priceScale('right').applyOptions({ autoScale: true });
         chart.timeScale().fitContent();
+        setTimeout(() => {
+            chart.priceScale('right').applyOptions({ autoScale: false });
+        }, 100);
     });
 
     candleSeries = chart.addCandlestickSeries({
-        upColor: '#10b981',
-        downColor: '#ef4444',
-        borderUpColor: '#10b981',
-        borderDownColor: '#ef4444',
-        wickUpColor: '#10b981',
-        wickDownColor: '#ef4444'
+        upColor: '#0ecb81',
+        downColor: '#f6465d',
+        borderUpColor: '#0ecb81',
+        borderDownColor: '#f6465d',
+        wickUpColor: '#0ecb81',
+        wickDownColor: '#f6465d'
     });
 
     updateChart();
 
-    // Use ResizeObserver for instant resize
+    // Resize handling
     if (typeof ResizeObserver !== 'undefined') {
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 const { width, height } = entry.contentRect;
                 if (width > 0 && height > 0) {
-                    chart.applyOptions({
-                        width: width,
-                        height: Math.min(height, 300)
-                    });
-                    chart.timeScale().fitContent();
+                    chart.applyOptions({ width, height: Math.min(height, 300) });
                 }
             }
         });
         resizeObserver.observe(container);
-    } else {
-        // Fallback for older browsers
-        window.addEventListener('resize', () => {
-            const newWidth = container.clientWidth;
-            const newHeight = Math.min(container.clientHeight, 300);
-            chart.applyOptions({ width: newWidth, height: newHeight });
-            chart.timeScale().fitContent();
-        });
     }
 
     window.candleSeries = candleSeries;
@@ -611,15 +577,23 @@ function updateChart(forceFit = false) {
     if (history && candleSeries) {
         candleSeries.setData(history);
 
-        // Auto-fit only once or when forced (like switching pairs)
+        // Initial manual fit to keep it free but centered
         if (forceFit || !state.chartInitialized) {
             chart.timeScale().fitContent();
-            // Temporarily enable autoScale to find the right range, then lock it
-            chart.priceScale('right').applyOptions({ autoScale: true });
-            setTimeout(() => {
-                chart.priceScale('right').applyOptions({ autoScale: false });
-                state.chartInitialized = true;
-            }, 50);
+
+            // Manual price range calculation to keep scale 'Unlocked' from the start
+            const prices = history.map(h => [h.high, h.low]).flat();
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const margin = (max - min) * 0.15;
+
+            chart.priceScale('right').applyOptions({ autoScale: false });
+            chart.priceScale('right').setVisiblePriceRange({
+                from: min - margin,
+                to: max + margin,
+            });
+
+            state.chartInitialized = true;
         }
     }
 }
