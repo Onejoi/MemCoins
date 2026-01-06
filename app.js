@@ -467,31 +467,68 @@ function initChart() {
         width: containerWidth,
         height: containerHeight,
         layout: {
-            background: { type: 'solid', color: '#1e2329' },
-            textColor: '#848e9c'
+            background: { type: 'solid', color: '#161a1e' }, // Binance Dark
+            textColor: '#848e9c',
+            fontSize: 12,
+            fontFamily: "'Inter', sans-serif"
         },
         grid: {
-            vertLines: { color: '#2b3139' },
-            horzLines: { color: '#2b3139' }
+            vertLines: { color: 'rgba(43, 49, 57, 0.5)' },
+            horzLines: { color: 'rgba(43, 49, 57, 0.5)' }
         },
         crosshair: {
-            mode: LightweightCharts.CrosshairMode.Normal
+            mode: LightweightCharts.CrosshairMode.Normal,
+            vertLine: {
+                width: 1,
+                color: '#848e9c',
+                style: 2, // Dashed
+                labelBackgroundColor: '#414854',
+            },
+            horzLine: {
+                width: 1,
+                color: '#848e9c',
+                style: 2, // Dashed
+                labelBackgroundColor: '#414854',
+            },
         },
         rightPriceScale: {
-            borderColor: '#2b3139'
+            borderColor: '#2b3139',
+            autoScale: true,
+            alignLabels: true,
+            borderVisible: true,
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.2,
+            },
         },
         timeScale: {
             borderColor: '#2b3139',
-            timeVisible: true
+            timeVisible: true,
+            secondsVisible: false,
+            rightOffset: 12,
+            barSpacing: 10,
+            fixLeftEdge: false,
+            fixRightEdge: false, // Allows dragging chart beyond current candle
+            lockVisibleTimeRangeOnResize: true,
+            rightBarStaysOnScroll: false, // Binance-style: pan moves EVERYTHING
+            borderVisible: true,
+            shiftVisibleRangeOnNewBar: false, // STOP JUMPING on update
         },
         handleScroll: {
             mouseWheel: true,
             pressedMouseMove: true,
             horzTouchDrag: true,
-            vertTouchDrag: true
+            vertTouchDrag: true,
+            kineticScroll: {
+                touch: true,
+                mouse: true
+            }
         },
         handleScale: {
-            axisPressedMouseMove: true,
+            axisPressedMouseMove: {
+                price: true,
+                time: true
+            },
             mouseWheel: true,
             pinch: true
         }
