@@ -485,13 +485,15 @@ function initChart() {
             timeVisible: true
         },
         handleScroll: {
-            mouseWheel: false,
-            pressedMouseMove: true
+            mouseWheel: true,
+            pressedMouseMove: true,
+            horzTouchDrag: true,
+            vertTouchDrag: true
         },
         handleScale: {
-            axisPressedMouseMove: false,
-            mouseWheel: false,
-            pinch: false
+            axisPressedMouseMove: true,
+            mouseWheel: true,
+            pinch: true
         }
     });
 
@@ -538,7 +540,6 @@ function updateChart() {
     const history = state.priceHistory[state.currentPair];
     if (history && candleSeries) {
         candleSeries.setData(history);
-        chart.timeScale().fitContent();
     }
 }
 
