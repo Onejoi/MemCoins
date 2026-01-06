@@ -216,15 +216,23 @@ body {
 @media (min-width: 769px) {
     .exchange-layout {
         display: grid;
-        grid-template-columns: 140px minmax(0, 1fr) 200px;
+        grid-template-columns: 200px 1fr 280px;
         max-width: 100%;
+        height: calc(100vh - var(--header-height) - var(--nav-height));
         overflow: hidden;
     }
 
     .chart-section {
         min-width: 0;
         max-width: 100%;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .chart-container {
+        min-height: 400px;
+        flex: 1;
     }
 }
 
@@ -437,16 +445,11 @@ body {
     width: 100%;
     max-width: 100%;
     min-height: 250px;
-    max-height: 350px;
-    padding: 8px;
+    height: 100%;
+    padding: 0;
     overflow: hidden;
     position: relative;
-}
-
-.chart-container>div,
-.chart-container canvas {
-    max-width: 100% !important;
-    width: 100% !important;
+    background: #161a1e;
 }
 
 /* Order Section */
@@ -491,6 +494,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .order-type-selector {
