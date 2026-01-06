@@ -248,21 +248,29 @@ function renderOrderbook() {
     if (!book) return;
 
     // Render asks (Sell Orders)
-    const asksHtml = [...book.asks].reverse().map(order => `
-        <div class="orderbook-row sell" onclick="buySpecificOrder('${order.id}')" title="Нажмите, чтобы купить именно этот номер">
-            <span class="price">${formatPrice(order.price)}</span>
-            <span class="serial">#${order.card.serialNumber}</span>
-            <span class="rarity ${order.card.rarity}">${order.card.rarity.toUpperCase()}</span>
-            <div class="depth-bar ask" style="width: ${Math.random() * 50 + 20}%"></div>
-        </div>
-    `).join('');
+    const asksHtml = [...book.asks].reverse().map(order => {
+        const rarity = order.card.rarity.toLowerCase();
+        const isLegendary = rarity === 'legendary';
+        const crown = isLegendary ? '👑 ' : '';
+
+        return `
+            <div class="orderbook-row sell ${rarity}" onclick="buySpecificOrder('${order.id}')" title="Нажмите, чтобы купить именно этот номер">
+                <span class="price">${formatPrice(order.price)}</span>
+                <span class="serial">#${order.card.serialNumber}</span>
+                <span class="rarity-badge ${rarity}">
+                    ${crown}${order.card.rarity.toUpperCase()}
+                </span>
+                <div class="depth-bar ask" style="width: ${Math.random() * 50 + 20}%"></div>
+            </div>
+        `;
+    }).join('');
 
     // Render bids (Buy Orders)
     const bidsHtml = book.bids.map(order => `
         <div class="orderbook-row buy">
             <span class="price">${formatPrice(order.price)}</span>
-            <span class="amount">${order.amount} шт.</span>
-            <span class="label">Ордер</span>
+            <span class="serial">${order.amount} шт.</span>
+            <span class="rarity-badge">ОРДЕР</span>
             <div class="depth-bar bid" style="width: ${Math.random() * 50 + 20}%"></div>
         </div>
     `).join('');
