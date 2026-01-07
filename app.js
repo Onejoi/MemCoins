@@ -461,10 +461,26 @@ function initChart() {
     const container = document.getElementById('chartContainer');
     if (!container) return;
 
-    // Wait for thermal settling of the layout
+    // Wait for layout to settle
     setTimeout(() => {
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight || 450;
+        // Calculate available height dynamically
+        const chartSection = container.closest('.chart-section');
+        const pairInfo = chartSection?.querySelector('.pair-info');
+        const timeframeSelector = chartSection?.querySelector('.timeframe-selector');
+        const orderSection = chartSection?.querySelector('.order-section');
+
+        let availableHeight = chartSection?.clientHeight || window.innerHeight - 200;
+        if (pairInfo) availableHeight -= pairInfo.offsetHeight;
+        if (timeframeSelector) availableHeight -= timeframeSelector.offsetHeight;
+        if (orderSection) availableHeight -= orderSection.offsetHeight;
+
+        // Ensure minimum height
+        availableHeight = Math.max(availableHeight, 250);
+
+        const containerWidth = container.clientWidth || chartSection?.clientWidth || 600;
+
+        // Set container height explicitly
+        container.style.height = availableHeight + 'px';
 
         chart = LightweightCharts.createChart(container, {
             width: containerWidth,
@@ -613,18 +629,29 @@ function initChart() {
 
         updateChart();
 
-        // Resize handling - use resize() for reliable updates
+        // Resize handling - observe chart-section and recalculate dynamically
         if (typeof ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(() => {
                 requestAnimationFrame(() => {
-                    const w = container.clientWidth;
-                    const h = container.clientHeight;
-                    if (w > 0 && h > 0 && chart) {
-                        chart.resize(w, h);
+                    if (!chart || !chartSection) return;
+
+                    // Recalculate available height
+                    let newHeight = chartSection.clientHeight;
+                    if (pairInfo) newHeight -= pairInfo.offsetHeight;
+                    if (timeframeSelector) newHeight -= timeframeSelector.offsetHeight;
+                    if (orderSection) newHeight -= orderSection.offsetHeight;
+                    newHeight = Math.max(newHeight, 250);
+
+                    const newWidth = container.clientWidth;
+
+                    if (newWidth > 0 && newHeight > 0) {
+                        container.style.height = newHeight + 'px';
+                        chart.resize(newWidth, newHeight);
                     }
                 });
             });
-            resizeObserver.observe(container);
+            // Observe the section, not just the container
+            resizeObserver.observe(chartSection);
         }
 
         window.candleSeries = candleSeries;
