@@ -233,6 +233,11 @@ body {
         overflow: hidden;
     }
 
+    .chart-section .pair-info,
+    .chart-section .timeframe-selector {
+        flex-shrink: 0;
+    }
+
     .chart-container {
         flex: 1;
         min-height: 200px;
