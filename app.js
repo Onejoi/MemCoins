@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initChart();
     setupEventListeners();
 
-    // Start real-time updates - Accelerated to 1s for "Silent Refresh" feel
-    setInterval(updatePrices, 1000);
-    setInterval(addRandomTrade, 2000);
+    // Start real-time updates
+    setInterval(updatePrices, 3000);
+    setInterval(addRandomTrade, 5000);
 });
 
 function mintCard(memeId, rarity, serialNum) {
@@ -629,50 +629,19 @@ function initChart() {
 
         updateChart();
 
-        // Resize handling - observe chart-section and recalculate dynamically
+        // Simplified Resize Handling: Just follow the container's lead
         if (typeof ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(() => {
                 requestAnimationFrame(() => {
-                    if (!chart || !chartSection) return;
-
-                    // Recalculate available height
-                    let newHeight = chartSection.clientHeight;
-                    if (pairInfo) newHeight -= pairInfo.offsetHeight;
-                    if (timeframeSelector) newHeight -= timeframeSelector.offsetHeight;
-                    if (orderSection) newHeight -= orderSection.offsetHeight;
-                    newHeight = Math.max(newHeight, 250);
-
-                    const newWidth = container.clientWidth;
-
-                    if (newWidth > 0 && newHeight > 0) {
-                        container.style.height = newHeight + 'px';
-                        chart.resize(newWidth, newHeight);
+                    const w = container.clientWidth;
+                    const h = container.clientHeight;
+                    if (w > 0 && h > 0 && chart) {
+                        chart.resize(w, h);
                     }
                 });
             });
-            // Observe the section, not just the container
-            resizeObserver.observe(chartSection);
+            resizeObserver.observe(container);
         }
-
-        // --- SILENT REFRESH HEARTBEAT (1s) ---
-        // Forces chart to re-calculate dimensions every second as a fallback
-        setInterval(() => {
-            if (!chart || !chartSection || !container) return;
-
-            const w = container.clientWidth;
-            // Recalculate available height logic
-            let h = chartSection.clientHeight;
-            if (pairInfo) h -= pairInfo.offsetHeight;
-            if (timeframeSelector) h -= timeframeSelector.offsetHeight;
-            if (orderSection) h -= orderSection.offsetHeight;
-            h = Math.max(h, 250);
-
-            // Only trigger resize if dimensions actually changed or as a safety measure
-            if (chart.options().width !== w || chart.options().height !== h) {
-                container.style.height = h + 'px';
-                chart.resize(w, h);
-            }
-        }, 1000);
 
         window.candleSeries = candleSeries;
     }, 100);
