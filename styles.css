@@ -437,16 +437,19 @@ body {
     width: 100%;
     max-width: 100%;
     min-height: 250px;
-    max-height: 350px;
+    height: 350px;
+    /* Default for mobile */
     padding: 8px;
     overflow: hidden;
     position: relative;
+    background: #161a1e;
 }
 
-.chart-container>div,
-.chart-container canvas {
-    max-width: 100% !important;
-    width: 100% !important;
+@media (min-width: 769px) {
+    .chart-container {
+        height: 500px;
+        /* Larger on PC */
+    }
 }
 
 /* Order Section */
