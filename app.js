@@ -432,13 +432,22 @@ function updateCurrentPairInfo() {
     const changeClass = priceData.change24h >= 0 ? 'positive' : 'negative';
     const changeSign = priceData.change24h >= 0 ? '+' : '';
 
-    const iconHtml = meme.image
-        ? `<img src="${meme.image}" class="pair-icon" alt="${meme.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`
-        : '';
+    const iconContainer = document.getElementById('currentEmoji');
+    iconContainer.innerHTML = '';
 
-    const emojiHtml = `<span class="pair-emoji" style="${meme.image ? 'display:none' : 'display:flex'}">${meme.emoji}</span>`;
-
-    document.getElementById('currentEmoji').innerHTML = iconHtml + emojiHtml;
+    if (meme.image) {
+        const img = document.createElement('img');
+        img.src = meme.image;
+        img.className = 'pair-icon';
+        img.alt = meme.name;
+        img.onerror = () => {
+            img.style.display = 'none';
+            iconContainer.innerHTML = `<span class="pair-emoji">${meme.emoji}</span>`;
+        };
+        iconContainer.appendChild(img);
+    } else {
+        iconContainer.innerHTML = `<span class="pair-emoji">${meme.emoji}</span>`;
+    }
     document.getElementById('currentPairName').textContent = meme.id.toUpperCase();
     document.getElementById('currentPrice').innerHTML = formatPrice(priceData.current);
 
@@ -472,6 +481,7 @@ function initChart() {
     chart = LightweightCharts.createChart(container, {
         width: w,
         height: h,
+        // autoSize disabled to prevent conflict with manual scale
         layout: {
             background: { type: 'solid', color: '#161a1e' },
             textColor: '#d1d4dc',
@@ -582,10 +592,13 @@ function initChart() {
     // --- RELIABLE RESIZE ---
     if (typeof ResizeObserver !== 'undefined') {
         const ro = new ResizeObserver(() => {
-            const rect = container.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-                chart.resize(rect.width, rect.height);
-            }
+            requestAnimationFrame(() => {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                if (width > 0 && height > 0 && chart) {
+                    chart.resize(width, height);
+                }
+            });
         });
         ro.observe(container);
     }
