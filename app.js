@@ -561,7 +561,8 @@ function initChart() {
             // Convert pixels to bars (approx spacing is barSpacing)
             const barSpacing = chart.timeScale().options().barSpacing;
             const scrollDelta = dx / barSpacing;
-            chart.timeScale().scrollToPosition(startScrollPos + scrollDelta, false);
+            // INVERTED: subtraction instead of addition
+            chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
         }
     });
 
@@ -585,7 +586,8 @@ function initChart() {
             const dx = e.touches[0].clientX - startAxisX;
             const barSpacing = chart.timeScale().options().barSpacing;
             const scrollDelta = dx / barSpacing;
-            chart.timeScale().scrollToPosition(startScrollPos + scrollDelta, false);
+            // INVERTED: subtraction instead of addition
+            chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
         }
     }, { passive: true });
 
