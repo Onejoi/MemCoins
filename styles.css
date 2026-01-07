@@ -217,14 +217,31 @@ body {
     .exchange-layout {
         display: grid;
         grid-template-columns: 140px minmax(0, 1fr) 200px;
+        grid-template-rows: 1fr;
         max-width: 100%;
         overflow: hidden;
+        height: calc(100vh - var(--header-height) - var(--nav-height));
+        height: calc(100dvh - var(--header-height) - var(--nav-height));
     }
 
     .chart-section {
+        display: flex;
+        flex-direction: column;
         min-width: 0;
         max-width: 100%;
+        height: 100%;
         overflow: hidden;
+    }
+
+    .chart-container {
+        flex: 1;
+        min-height: 200px;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .order-section {
+        flex-shrink: 0;
     }
 }
 
@@ -438,18 +455,10 @@ body {
     max-width: 100%;
     min-height: 250px;
     height: 350px;
-    /* Default for mobile */
     padding: 8px;
     overflow: hidden;
     position: relative;
     background: #161a1e;
-}
-
-@media (min-width: 769px) {
-    .chart-container {
-        height: 500px;
-        /* Larger on PC */
-    }
 }
 
 /* Order Section */
