@@ -8,15 +8,14 @@
 // ============================================
 
 const MEME_TYPES = [
-    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', basePrice: 1500, color: '#ef4444' },
-    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', basePrice: 800, color: '#22c55e' },
-    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', basePrice: 2500, color: '#f59e0b' },
-    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', basePrice: 500, color: '#3b82f6' },
-    { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', basePrice: 2500, color: '#a855f7' },
-    { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', basePrice: 350, color: '#ef4444' },
-    { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', basePrice: 150, color: '#f59e0b' },
-    { id: 'stonks', name: 'Стонкс Мэн', image: 'images/stonks.png', basePrice: 700, color: '#22c55e' }
-    // Сюда можно добавлять еще и еще...
+    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', emoji: '🥊', basePrice: 1500, color: '#ef4444' },
+    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', emoji: '🐸', basePrice: 800, color: '#22c55e' },
+    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', emoji: '🐕', basePrice: 2500, color: '#f59e0b' },
+    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', emoji: '🤕', basePrice: 500, color: '#3b82f6' },
+    { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', emoji: '🗿', basePrice: 2500, color: '#a855f7' },
+    { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', emoji: '🐸', basePrice: 350, color: '#ef4444' },
+    { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', emoji: '🐕', basePrice: 150, color: '#f59e0b' },
+    { id: 'stonks', name: 'Стонкс Мэн', image: 'images/stonks.png', emoji: '📈', basePrice: 700, color: '#22c55e' }
 ];
 
 const RARITIES = {
@@ -434,10 +433,12 @@ function updateCurrentPairInfo() {
     const changeSign = priceData.change24h >= 0 ? '+' : '';
 
     const iconHtml = meme.image
-        ? `<img src="${meme.image}" class="pair-icon" alt="${meme.name}">`
-        : meme.emoji;
+        ? `<img src="${meme.image}" class="pair-icon" alt="${meme.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`
+        : '';
 
-    document.getElementById('currentEmoji').innerHTML = iconHtml;
+    const emojiHtml = `<span class="pair-emoji" style="${meme.image ? 'display:none' : 'display:flex'}">${meme.emoji}</span>`;
+
+    document.getElementById('currentEmoji').innerHTML = iconHtml + emojiHtml;
     document.getElementById('currentPairName').textContent = meme.id.toUpperCase();
     document.getElementById('currentPrice').innerHTML = formatPrice(priceData.current);
 
@@ -581,10 +582,9 @@ function initChart() {
     // --- RELIABLE RESIZE ---
     if (typeof ResizeObserver !== 'undefined') {
         const ro = new ResizeObserver(() => {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            if (width > 0 && height > 0) {
-                chart.resize(width, height);
+            const rect = container.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                chart.resize(rect.width, rect.height);
             }
         });
         ro.observe(container);
