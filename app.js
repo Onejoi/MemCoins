@@ -613,14 +613,16 @@ function initChart() {
 
         updateChart();
 
-        // Resize handling
+        // Resize handling - use resize() for reliable updates
         if (typeof ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(() => {
-                const w = container.clientWidth;
-                const h = container.clientHeight;
-                if (w > 0 && h > 0) {
-                    chart.applyOptions({ width: w, height: h });
-                }
+                requestAnimationFrame(() => {
+                    const w = container.clientWidth;
+                    const h = container.clientHeight;
+                    if (w > 0 && h > 0 && chart) {
+                        chart.resize(w, h);
+                    }
+                });
             });
             resizeObserver.observe(container);
         }
