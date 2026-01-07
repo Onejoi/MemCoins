@@ -8,14 +8,15 @@
 // ============================================
 
 const MEME_TYPES = [
-    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', emoji: '🥊', basePrice: 1500, color: '#ef4444' },
-    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', emoji: '🐸', basePrice: 800, color: '#22c55e' },
-    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', emoji: '🐕', basePrice: 2500, color: '#f59e0b' },
-    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', emoji: '🤕', basePrice: 500, color: '#3b82f6' },
-    { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', emoji: '🗿', basePrice: 2500, color: '#a855f7' },
-    { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', emoji: '🐸', basePrice: 350, color: '#ef4444' },
-    { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', emoji: '🐕', basePrice: 150, color: '#f59e0b' },
-    { id: 'stonks', name: 'Стонкс Мэн', image: 'images/stonks.png', emoji: '📈', basePrice: 700, color: '#22c55e' }
+    { id: 'fighter', name: 'Бомж Файтер', image: 'images/fighter.png', basePrice: 1500, color: '#ef4444' },
+    { id: 'pepe', name: 'Пепе Трейдер', image: 'images/pepe.png', basePrice: 800, color: '#22c55e' },
+    { id: 'doge', name: 'Доге Бизнесмен', image: 'images/doge.png', basePrice: 2500, color: '#f59e0b' },
+    { id: 'wojak', name: 'Нубо Трейдер', image: 'images/wojak.png', basePrice: 500, color: '#3b82f6' },
+    { id: 'chad', name: 'ГигаЧад', image: 'images/chad.png', basePrice: 2500, color: '#a855f7' },
+    { id: 'kermit', name: 'Кермит в Шоке', image: 'images/kermit.png', basePrice: 350, color: '#ef4444' },
+    { id: 'cheems', name: 'Чимс', image: 'images/cheems.png', basePrice: 150, color: '#f59e0b' },
+    { id: 'stonks', name: 'Стонкс Мэн', image: 'images/stonks.png', basePrice: 700, color: '#22c55e' }
+    // Сюда можно добавлять еще и еще...
 ];
 
 const RARITIES = {
@@ -432,22 +433,11 @@ function updateCurrentPairInfo() {
     const changeClass = priceData.change24h >= 0 ? 'positive' : 'negative';
     const changeSign = priceData.change24h >= 0 ? '+' : '';
 
-    const iconContainer = document.getElementById('currentEmoji');
-    iconContainer.innerHTML = '';
+    const iconHtml = meme.image
+        ? `<img src="${meme.image}" class="pair-icon" alt="${meme.name}">`
+        : meme.emoji;
 
-    if (meme.image) {
-        const img = document.createElement('img');
-        img.src = meme.image;
-        img.className = 'pair-icon';
-        img.alt = meme.name;
-        img.onerror = () => {
-            img.style.display = 'none';
-            iconContainer.innerHTML = `<span class="pair-emoji">${meme.emoji}</span>`;
-        };
-        iconContainer.appendChild(img);
-    } else {
-        iconContainer.innerHTML = `<span class="pair-emoji">${meme.emoji}</span>`;
-    }
+    document.getElementById('currentEmoji').innerHTML = iconHtml;
     document.getElementById('currentPairName').textContent = meme.id.toUpperCase();
     document.getElementById('currentPrice').innerHTML = formatPrice(priceData.current);
 
@@ -471,139 +461,172 @@ function initChart() {
     const container = document.getElementById('chartContainer');
     if (!container) return;
 
-    // Clear to prevent duplicates
-    container.innerHTML = '';
+    // Wait for thermal settling of the layout
+    setTimeout(() => {
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight || 450;
 
-    // Initial sizing
-    const w = container.clientWidth;
-    const h = container.clientHeight || 450;
+        chart = LightweightCharts.createChart(container, {
+            width: containerWidth,
+            height: containerHeight,
+            layout: {
+                background: { type: 'solid', color: '#161a1e' },
+                textColor: '#d1d4dc',
+                fontSize: 12,
+                fontFamily: "'Inter', sans-serif"
+            },
+            grid: {
+                vertLines: { color: 'rgba(43, 49, 57, 0.4)' },
+                horzLines: { color: 'rgba(43, 49, 57, 0.4)' }
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    width: 1,
+                    color: '#758696',
+                    style: 3,
+                    labelBackgroundColor: '#161a1e',
+                },
+                horzLine: {
+                    width: 1,
+                    color: '#758696',
+                    style: 3,
+                    labelBackgroundColor: '#161a1e',
+                },
+            },
+            rightPriceScale: {
+                borderColor: '#2b3139',
+                autoScale: false, // Manual from start for freedom
+                visible: true,
+                alignLabels: true,
+                borderVisible: true,
+                scaleMargins: {
+                    top: 0.1,
+                    bottom: 0.2,
+                },
+            },
+            timeScale: {
+                borderColor: '#2b3139',
+                timeVisible: true,
+                secondsVisible: false,
+                rightOffset: 20,
+                barSpacing: 10,
+                fixLeftEdge: false,
+                fixRightEdge: false,
+                lockVisibleTimeRangeOnResize: false,
+                rightBarStaysOnScroll: false,
+                borderVisible: true,
+                shiftVisibleRangeOnNewBar: false,
+            },
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: true,
+            },
+            handleScale: {
+                mouseWheel: true,
+                pinch: true,
+                axisPressedMouseMove: {
+                    price: true,
+                    time: false // Disable default zoom to implement custom PAN
+                }
+            },
+            kineticScroll: {
+                touch: true,
+                mouse: true
+            }
+        });
 
-    chart = LightweightCharts.createChart(container, {
-        width: w,
-        height: h,
-        // autoSize disabled to prevent conflict with manual scale
-        layout: {
-            background: { type: 'solid', color: '#161a1e' },
-            textColor: '#d1d4dc',
-            fontSize: 12,
-            fontFamily: "'Inter', sans-serif"
-        },
-        grid: {
-            vertLines: { color: 'rgba(43, 49, 57, 0.4)' },
-            horzLines: { color: 'rgba(43, 49, 57, 0.4)' }
-        },
-        crosshair: {
-            mode: LightweightCharts.CrosshairMode.Normal,
-            vertLine: { width: 1, color: '#758696', style: 3, labelBackgroundColor: '#161a1e' },
-            horzLine: { width: 1, color: '#758696', style: 3, labelBackgroundColor: '#161a1e' },
-        },
-        rightPriceScale: {
-            borderColor: '#2b3139',
-            autoScale: false,
-            visible: true,
-            alignLabels: true,
-            borderVisible: true,
-            scaleMargins: { top: 0.1, bottom: 0.2 },
-        },
-        timeScale: {
-            borderColor: '#2b3139',
-            timeVisible: true,
-            secondsVisible: false,
-            rightOffset: 20,
-            barSpacing: 10,
-            fixLeftEdge: false,
-            fixRightEdge: false,
-            lockVisibleTimeRangeOnResize: false,
-            rightBarStaysOnScroll: false,
-            borderVisible: true,
-            shiftVisibleRangeOnNewBar: false,
-        },
-        handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: true },
-        handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: { price: true, time: false } },
-        kineticScroll: { touch: true, mouse: true }
-    });
+        // --- CUSTOM TIME AXIS PANNING ---
+        let isAxisDragging = false;
+        let startAxisX = 0;
+        let startScrollPos = 0;
 
-    // --- CUSTOM TIME AXIS PANNING ---
-    let isAxisDragging = false;
-    let startAxisX = 0;
-    let startScrollPos = 0;
-
-    container.addEventListener('mousedown', (e) => {
-        const rect = container.getBoundingClientRect();
-        const y = e.clientY - rect.top;
-        if (y > rect.height - 30) {
-            isAxisDragging = true;
-            startAxisX = e.clientX;
-            startScrollPos = chart.timeScale().scrollPosition();
-            e.stopPropagation();
-        }
-    }, true);
-
-    window.addEventListener('mousemove', (e) => {
-        if (isAxisDragging) {
-            const dx = e.clientX - startAxisX;
-            const barSpacing = chart.timeScale().options().barSpacing;
-            const scrollDelta = dx / barSpacing;
-            chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
-        }
-    });
-
-    window.addEventListener('mouseup', () => { isAxisDragging = false; });
-
-    container.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
+        container.addEventListener('mousedown', (e) => {
             const rect = container.getBoundingClientRect();
-            const y = e.touches[0].clientY - rect.top;
+            const y = e.clientY - rect.top;
+            // If clicked in bottom 30px (Time Axis zone)
             if (y > rect.height - 30) {
                 isAxisDragging = true;
-                startAxisX = e.touches[0].clientX;
-                startScrollPos = chart.timeScale().scrollPosition();
+                startAxisX = e.clientX;
+                // Get current scroll position (approximation)
+                const range = chart.timeScale().getVisibleRange();
+                if (range) startScrollPos = chart.timeScale().scrollPosition();
+                e.stopPropagation();
             }
-        }
-    }, { passive: true });
+        }, true);
 
-    container.addEventListener('touchmove', (e) => {
-        if (isAxisDragging && e.touches.length === 1) {
-            const dx = e.touches[0].clientX - startAxisX;
-            const barSpacing = chart.timeScale().options().barSpacing;
-            const scrollDelta = dx / barSpacing;
-            chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
-        }
-    }, { passive: true });
+        window.addEventListener('mousemove', (e) => {
+            if (isAxisDragging) {
+                const dx = e.clientX - startAxisX;
+                // Convert pixels to bars (approx spacing is barSpacing)
+                const barSpacing = chart.timeScale().options().barSpacing;
+                const scrollDelta = dx / barSpacing;
+                // INVERTED: subtraction instead of addition
+                chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
+            }
+        });
 
-    // --- RESET SCALE ---
-    container.addEventListener('dblclick', () => {
-        chart.priceScale('right').applyOptions({ autoScale: true });
-        chart.timeScale().fitContent();
-        setTimeout(() => chart.priceScale('right').applyOptions({ autoScale: false }), 100);
-    });
+        window.addEventListener('mouseup', () => { isAxisDragging = false; });
 
-    candleSeries = chart.addCandlestickSeries({
-        upColor: '#0ecb81',
-        downColor: '#f6465d',
-        borderUpColor: '#0ecb81',
-        borderDownColor: '#f6465d',
-        wickUpColor: '#0ecb81',
-        wickDownColor: '#f6465d'
-    });
+        // Touch support for axis pan
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                const rect = container.getBoundingClientRect();
+                const y = e.touches[0].clientY - rect.top;
+                if (y > rect.height - 30) {
+                    isAxisDragging = true;
+                    startAxisX = e.touches[0].clientX;
+                    startScrollPos = chart.timeScale().scrollPosition();
+                }
+            }
+        }, { passive: true });
 
-    updateChart();
+        container.addEventListener('touchmove', (e) => {
+            if (isAxisDragging && e.touches.length === 1) {
+                const dx = e.touches[0].clientX - startAxisX;
+                const barSpacing = chart.timeScale().options().barSpacing;
+                const scrollDelta = dx / barSpacing;
+                // INVERTED: subtraction instead of addition
+                chart.timeScale().scrollToPosition(startScrollPos - scrollDelta, false);
+            }
+        }, { passive: true });
 
-    // --- RELIABLE RESIZE ---
-    if (typeof ResizeObserver !== 'undefined') {
-        const ro = new ResizeObserver(() => {
-            requestAnimationFrame(() => {
-                const width = container.clientWidth;
-                const height = container.clientHeight;
-                if (width > 0 && height > 0 && chart) {
-                    chart.resize(width, height);
+        // --- RESET SCALE ON DOUBLE CLICK ---
+        container.addEventListener('dblclick', () => {
+            chart.priceScale('right').applyOptions({ autoScale: true });
+            chart.timeScale().fitContent();
+            setTimeout(() => {
+                chart.priceScale('right').applyOptions({ autoScale: false });
+            }, 100);
+        });
+
+        candleSeries = chart.addCandlestickSeries({
+            upColor: '#0ecb81',
+            downColor: '#f6465d',
+            borderUpColor: '#0ecb81',
+            borderDownColor: '#f6465d',
+            wickUpColor: '#0ecb81',
+            wickDownColor: '#f6465d'
+        });
+
+        updateChart();
+
+        // Resize handling
+        if (typeof ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(() => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                if (w > 0 && h > 0) {
+                    chart.applyOptions({ width: w, height: h });
                 }
             });
-        });
-        ro.observe(container);
-    }
+            resizeObserver.observe(container);
+        }
 
-    window.candleSeries = candleSeries;
+        window.candleSeries = candleSeries;
+    }, 100);
 }
 
 function updateChart(forceFit = false) {
