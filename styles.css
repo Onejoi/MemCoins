@@ -203,10 +203,9 @@ body {
 .exchange-layout {
     display: flex;
     flex-direction: column;
-    gap: 1px;
     background: var(--bg-tertiary);
-    min-height: calc(100vh - var(--header-height) - var(--nav-height));
-    min-height: calc(100dvh - var(--header-height) - var(--nav-height));
+    height: calc(100vh - var(--header-height) - var(--nav-height));
+    height: calc(100dvh - var(--header-height) - var(--nav-height));
     width: 100%;
     max-width: 100%;
     overflow: hidden;
@@ -217,11 +216,9 @@ body {
     .exchange-layout {
         display: grid;
         grid-template-columns: 140px minmax(0, 1fr) 200px;
-        grid-template-rows: 1fr;
+        grid-template-rows: 100%;
         max-width: 100%;
         overflow: hidden;
-        height: calc(100vh - var(--header-height) - var(--nav-height));
-        height: calc(100dvh - var(--header-height) - var(--nav-height));
     }
 
     .chart-section {
@@ -234,19 +231,17 @@ body {
     }
 
     .chart-section .pair-info,
-    .chart-section .timeframe-selector {
+    .chart-section .timeframe-selector,
+    .order-section {
         flex-shrink: 0;
     }
 
     .chart-container {
         flex: 1;
-        min-height: 200px;
-        height: auto !important;
-        max-height: none !important;
-    }
-
-    .order-section {
-        flex-shrink: 0;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        position: relative;
     }
 }
 
@@ -457,9 +452,8 @@ body {
 /* Chart Container */
 .chart-container {
     width: 100%;
-    max-width: 100%;
-    min-height: 250px;
     height: 350px;
+    /* Base for legacy/mobile fallback */
     overflow: hidden;
     position: relative;
     background: #161a1e;
